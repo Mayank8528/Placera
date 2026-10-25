@@ -210,12 +210,45 @@ In this Version 1 educational build, the JWT is stored in the browser's `localSt
 | `GET` | `/api/applications/job/:jobId` | Private (Recruiter) | View applicants for recruiter's job |
 | `PUT` | `/api/applications/:id/status` | Private (Recruiter) | Update status (`Applied`, `Shortlisted`, `Selected`, `Rejected`) |
 
+### Interview Routes
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `POST` | `/api/interviews` | Private (Recruiter) | Schedule interview for shortlisted applicant |
+| `GET` | `/api/interviews/my` | Private (Authenticated) | List interviews for current user (filtered by role) |
+| `GET` | `/api/interviews/:id` | Private (Participant/Admin) | View single interview details |
+| `PUT` | `/api/interviews/:id/respond` | Private (Student) | Confirm or decline a proposed interview |
+| `PUT` | `/api/interviews/:id/reschedule` | Private (Recruiter) | Reschedule to a new slot (runs conflict check) |
+| `PUT` | `/api/interviews/:id/cancel` | Private (Recruiter) | Cancel an interview with optional reason |
+| `PUT` | `/api/interviews/:id/complete` | Private (Recruiter) | Mark an interview completed |
+
+### Notification Routes
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET` | `/api/notifications` | Private (Authenticated) | Retrieve persistent notifications & unread count |
+| `PUT` | `/api/notifications/:id/read` | Private (Recipient) | Mark single notification as read |
+| `PUT` | `/api/notifications/read-all` | Private (Recipient) | Mark all user notifications as read |
+
 ### Admin Routes
 | Method | Endpoint | Access | Description |
 |---|---|---|---|
 | `GET` | `/api/admin/users` | Private (Admin) | View all registered users |
 | `GET` | `/api/admin/jobs` | Private (Admin) | View all job drives |
 | `DELETE` | `/api/admin/jobs/:id` | Private (Admin) | Remove inappropriate job drives |
+
+---
+
+## 📅 Interview Scheduling & Conflict Detection Logic
+
+The interview booking engine treats times as **half-open intervals**: `[startTime, endTime)`.
+- **Interval Overlap Condition**: An interview overlaps another if:
+  `existing.startTime < newInterview.endTime AND existing.endTime > newInterview.startTime`
+- **Back-to-back Allowed**: An interview ending at 11:00 and another starting at 11:00 do not overlap.
+- **Active Calendar Statuses**: Only `['proposed', 'confirmed']` block slots. `['cancelled', 'declined', 'completed']` free up slots.
+- **Participant Calendar Integrity**: A conflict is raised if either the recruiter OR the student already has an active interview during the requested interval.
+- **Self-Exclusion**: Rescheduling an interview excludes the interview's current record from conflict evaluation.
+
+### Concurrency Note
+Conflict checks execute in MongoDB queries prior to saving. In single-instance and replica set deployments, rapid parallel calls are mitigated through fast indexed lookups (`{ recruiterId: 1, startTime: 1, endTime: 1, status: 1 }`). In high-concurrency enterprise clusters with distributed nodes, race conditions between simultaneous bookings in the exact same millisecond can be guaranteed with MongoDB multi-document ACID transactions or distributed locks (e.g. Redlock/optimistic concurrency versions).
 
 ---
 
@@ -232,15 +265,16 @@ Use this checklist to test the application once your MongoDB instance is running
 2. **Student Workflows**:
    - [ ] Navigate to "My Profile" and save College, Branch, Graduation Year, and Skills.
    - [ ] Browse jobs and apply to an active job.
-   - [ ] Attempt to apply to the same job a second time; verify backend rejects with 400 "already applied".
    - [ ] View "My Applications" and check status badge ("Applied").
+   - [ ] Visit "My Interviews" page to review proposed interviews.
+   - [ ] Confirm or decline proposed interviews and verify status changes.
 3. **Recruiter Workflows**:
    - [ ] Login as recruiter and post a new job drive.
-   - [ ] Edit job description or deadline.
-   - [ ] Open "View Applicants" for the job; check that student academic details and skills appear.
-   - [ ] Update candidate status to "Shortlisted", then "Selected"; verify status updates in real-time.
-   - [ ] Log in as a different recruiter and attempt to edit/delete the first recruiter's job via direct API or URL; verify 403 Forbidden.
-4. **Admin Workflows**:
-   - [ ] Navigate to `/admin/dashboard`.
-   - [ ] Review registered user list.
-   - [ ] Moderate and remove a job listing; confirm associated applications are cleaned up.
+   - [ ] Open "View Applicants" for the job; update candidate status to "Shortlisted".
+   - [ ] Click "Schedule Interview"; enter date, start/end times, mode (online/in-person), meeting link.
+   - [ ] Verify validation catches reversed dates, past dates, or non-shortlisted candidates.
+   - [ ] Test conflict detection by scheduling an overlapping slot for the same recruiter or student.
+   - [ ] Go to Recruiter "Interviews" management page to reschedule or cancel interviews with reasons.
+4. **Notifications**:
+   - [ ] Check notification bell badge increments upon proposed/rescheduled/cancelled events.
+   - [ ] Open notification dropdown, click item to jump to interview, and mark as read.

@@ -6,21 +6,26 @@ import { useAuth } from '../context/AuthContext';
 const RecruiterDashboard = () => {
   const { user } = useAuth();
   const [jobs, setJobs] = useState([]);
+  const [interviews, setInterviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchMyJobs = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const res = await api.get('/jobs/recruiter/my');
-        setJobs(res.data.jobs || []);
+        const [jobsRes, interviewsRes] = await Promise.all([
+          api.get('/jobs/recruiter/my'),
+          api.get('/interviews/my'),
+        ]);
+        setJobs(jobsRes.data.jobs || []);
+        setInterviews(interviewsRes.data.interviews || []);
       } catch (err) {
-        console.error('Failed to load recruiter jobs', err);
+        console.error('Failed to load recruiter data', err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMyJobs();
+    fetchDashboardData();
   }, []);
 
   if (loading) {
@@ -33,7 +38,7 @@ const RecruiterDashboard = () => {
   }
 
   const activeJobs = jobs.filter((j) => new Date(j.deadline) >= new Date()).length;
-  const expiredJobs = jobs.filter((j) => new Date(j.deadline) < new Date()).length;
+  const activeInterviews = interviews.filter((i) => ['proposed', 'confirmed'].includes(i.status)).length;
 
   return (
     <div>
@@ -43,18 +48,21 @@ const RecruiterDashboard = () => {
             Recruiter Portal — {user?.name}
           </h1>
           <p style={{ color: 'var(--text-muted)' }}>
-            Manage campus recruitment drives, review student profiles, and update candidate stages.
+            Manage campus recruitment drives, schedule interviews, and evaluate candidate stages.
           </p>
         </div>
-        <div>
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <Link to="/recruiter/interviews" className="btn btn-secondary">
+            🗓️ Interviews
+          </Link>
           <Link to="/recruiter/jobs/create" className="btn btn-primary">
-            + Post New Opening
+            + Post Opening
           </Link>
         </div>
       </div>
 
       {/* Metrics Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', marginBottom: '2.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem', marginBottom: '2.5rem' }}>
         <div className="card">
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Total Job Postings</span>
           <h2 style={{ fontSize: '2.2rem', fontWeight: '800', marginTop: '0.3rem', color: '#60a5fa' }}>{jobs.length}</h2>
@@ -64,8 +72,12 @@ const RecruiterDashboard = () => {
           <h2 style={{ fontSize: '2.2rem', fontWeight: '800', marginTop: '0.3rem', color: '#34d399' }}>{activeJobs}</h2>
         </div>
         <div className="card">
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Closed Drives</span>
-          <h2 style={{ fontSize: '2.2rem', fontWeight: '800', marginTop: '0.3rem', color: '#f87171' }}>{expiredJobs}</h2>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Active Interviews</span>
+          <h2 style={{ fontSize: '2.2rem', fontWeight: '800', marginTop: '0.3rem', color: '#c084fc' }}>
+            <Link to="/recruiter/interviews" style={{ color: 'inherit' }}>
+              {activeInterviews}
+            </Link>
+          </h2>
         </div>
       </div>
 

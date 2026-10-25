@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import NotificationBell from './NotificationBell';
 
 const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -47,6 +48,11 @@ const Navbar = () => {
                   </NavLink>
                 </li>
                 <li>
+                  <NavLink to="/student/interviews" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                    My Interviews
+                  </NavLink>
+                </li>
+                <li>
                   <NavLink to="/student/profile" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
                     My Profile
                   </NavLink>
@@ -68,6 +74,11 @@ const Navbar = () => {
                   </NavLink>
                 </li>
                 <li>
+                  <NavLink to="/recruiter/interviews" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                    Interviews
+                  </NavLink>
+                </li>
+                <li>
                   <NavLink to="/recruiter/jobs/create" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
                     + Post Job
                   </NavLink>
@@ -84,9 +95,10 @@ const Navbar = () => {
               </li>
             )}
 
-            {/* User Session status */}
+            {/* User Session status & Notifications */}
             {isAuthenticated ? (
               <li className="nav-user">
+                <NotificationBell />
                 <span className="role-pill">{user?.role}</span>
                 <span style={{ fontSize: '0.9rem', color: 'var(--text-main)', fontWeight: '600' }}>
                   {user?.name}

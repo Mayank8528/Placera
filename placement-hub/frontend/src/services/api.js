@@ -11,10 +11,10 @@ const api = axios.create({
   },
 });
 
-// Interceptor to attach JWT token stored in localStorage
+// Interceptor to attach JWT token stored in sessionStorage (session-scoped to current tab)
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

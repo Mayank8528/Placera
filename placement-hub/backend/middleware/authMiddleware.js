@@ -14,26 +14,45 @@ const protect = async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer ')
   ) {
     try {
-      // Extract token from "Bearer <token>"
       token = req.headers.authorization.split(' ')[1];
 
-      // Verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      if (!token) {
+        return res.status(401).json({
+          success: false,
+          message: 'Not authorized, token missing',
+        });
+      }
 
-      // Fetch user from DB (excluding password)
+      const secret = process.env.JWT_SECRET || 'fallback_placementhub_secret_key';
+      const decoded = jwt.verify(token, secret);
+
       const user = await User.findById(decoded.id).select('-password');
       if (!user) {
-        return res.status(401).json({ message: 'User belonging to this token no longer exists' });
+        return res.status(401).json({
+          success: false,
+          message: 'User belonging to this token no longer exists',
+        });
       }
 
       req.user = user;
       next();
     } catch (error) {
-      console.error('[Auth Middleware] Verification failed:', error.message);
-      return res.status(401).json({ message: 'Not authorized, token invalid or expired' });
+      if (error.name === 'TokenExpiredError') {
+        return res.status(401).json({
+          success: false,
+          message: 'Not authorized, token has expired. Please sign in again.',
+        });
+      }
+      return res.status(401).json({
+        success: false,
+        message: 'Not authorized, token is invalid or malformed',
+      });
     }
   } else {
-    return res.status(401).json({ message: 'Not authorized, no token provided' });
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized, no bearer token provided',
+    });
   }
 };
 
@@ -45,6 +64,7 @@ const authorize = (...roles) => {
   return (req, res, next) => {
     if (!req.user || !roles.includes(req.user.role)) {
       return res.status(403).json({
+        success: false,
         message: `Forbidden: role '${req.user ? req.user.role : 'guest'}' is not allowed to access this resource`,
       });
     }
@@ -64,13 +84,16 @@ const optionalAuth = async (req, res, next) => {
   ) {
     try {
       const token = req.headers.authorization.split(' ')[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await User.findById(decoded.id).select('-password');
-      if (user) {
-        req.user = user;
+      if (token) {
+        const secret = process.env.JWT_SECRET || 'fallback_placementhub_secret_key';
+        const decoded = jwt.verify(token, secret);
+        const user = await User.findById(decoded.id).select('-password');
+        if (user) {
+          req.user = user;
+        }
       }
     } catch (error) {
-      // Ignore token failure for public routes, proceed as unauthenticated
+      // Proceed as unauthenticated for public endpoints
     }
   }
   next();

@@ -122,8 +122,17 @@ const updateStudentProfile = async (req, res, next) => {
  */
 const uploadStudentResume = async (req, res, next) => {
   try {
-    if (!req.file) {
+    if (!req.file || !req.file.buffer) {
       return res.status(400).json({ message: 'No file uploaded. Please select a PDF file.' });
+    }
+
+    // Server-side binary check: verify PDF magic bytes '%PDF-' (0x25 0x50 0x44 0x46 0x2D)
+    const isMagicPdf = req.file.buffer.length >= 5 && req.file.buffer.toString('utf8', 0, 5) === '%PDF-';
+    if (!isMagicPdf) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid file format. Uploaded file is not a valid PDF document.',
+      });
     }
 
     let profile = await StudentProfile.findOne({ userId: req.user._id });

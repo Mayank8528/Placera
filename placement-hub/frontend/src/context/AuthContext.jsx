@@ -4,8 +4,13 @@ import api from '../services/api';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
+  // Clear any legacy localStorage token to prevent persisting across tabs/sessions
+  if (typeof window !== 'undefined' && localStorage.getItem('token')) {
+    localStorage.removeItem('token');
+  }
+
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token') || null);
+  const [token, setToken] = useState(sessionStorage.getItem('token') || null);
   const [loading, setLoading] = useState(true);
 
   // When app loads or token changes, verify current user via /api/auth/me
@@ -22,7 +27,7 @@ export const AuthProvider = ({ children }) => {
         setUser(res.data.user);
       } catch (err) {
         console.error('[AuthContext] Failed to load current user:', err.response?.data?.message || err.message);
-        localStorage.removeItem('token');
+        sessionStorage.removeItem('token');
         setToken(null);
         setUser(null);
       } finally {
@@ -33,21 +38,21 @@ export const AuthProvider = ({ children }) => {
     fetchCurrentUser();
   }, [token]);
 
-  // Login handler
+  // Login handler: store in sessionStorage (clears automatically when tab is closed)
   const login = async (email, password) => {
     const res = await api.post('/auth/login', { email, password });
     const { token: receivedToken, user: receivedUser } = res.data;
-    localStorage.setItem('token', receivedToken);
+    sessionStorage.setItem('token', receivedToken);
     setToken(receivedToken);
     setUser(receivedUser);
     return receivedUser;
   };
 
-  // Register handler
+  // Register handler: store in sessionStorage
   const register = async (name, email, password, role) => {
     const res = await api.post('/auth/register', { name, email, password, role });
     const { token: receivedToken, user: receivedUser } = res.data;
-    localStorage.setItem('token', receivedToken);
+    sessionStorage.setItem('token', receivedToken);
     setToken(receivedToken);
     setUser(receivedUser);
     return receivedUser;
@@ -55,6 +60,7 @@ export const AuthProvider = ({ children }) => {
 
   // Logout handler
   const logout = () => {
+    sessionStorage.removeItem('token');
     localStorage.removeItem('token');
     setToken(null);
     setUser(null);

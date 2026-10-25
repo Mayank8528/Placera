@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import StatusBadge from '../components/StatusBadge';
+import ScheduleInterviewModal from '../components/ScheduleInterviewModal';
 
 const JobApplicants = () => {
   const { jobId } = useParams();
@@ -10,6 +11,7 @@ const JobApplicants = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [statusUpdateMessage, setStatusUpdateMessage] = useState('');
+  const [selectedApplicantForInterview, setSelectedApplicantForInterview] = useState(null);
 
   const fetchApplicants = async () => {
     try {
@@ -91,7 +93,7 @@ const JobApplicants = () => {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
                   <StatusBadge status={app.status} />
 
                   {/* Status update selector */}
@@ -106,6 +108,18 @@ const JobApplicants = () => {
                     <option value="Selected">Selected</option>
                     <option value="Rejected">Rejected</option>
                   </select>
+
+                  {/* Schedule Interview button (strictly for Shortlisted applicants) */}
+                  {app.status === 'Shortlisted' && (
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      style={{ fontSize: '0.82rem', padding: '0.35rem 0.75rem' }}
+                      onClick={() => setSelectedApplicantForInterview(app)}
+                    >
+                      🗓️ Schedule Interview
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -178,6 +192,22 @@ const JobApplicants = () => {
             </div>
           ))}
         </div>
+      )}
+
+      {selectedApplicantForInterview && (
+        <ScheduleInterviewModal
+          isOpen={!!selectedApplicantForInterview}
+          onClose={() => setSelectedApplicantForInterview(null)}
+          applicant={selectedApplicantForInterview}
+          jobId={jobId}
+          jobTitle={job?.title || 'Job Opening'}
+          onScheduled={(interview) => {
+            setStatusUpdateMessage(
+              `Interview proposal sent successfully to ${selectedApplicantForInterview.student?.name}!`
+            );
+            setTimeout(() => setStatusUpdateMessage(''), 4000);
+          }}
+        />
       )}
     </div>
   );

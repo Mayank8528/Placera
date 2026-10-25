@@ -8,17 +8,20 @@ const StudentDashboard = () => {
   const { user } = useAuth();
   const [profile, setProfile] = useState(null);
   const [applications, setApplications] = useState([]);
+  const [interviews, setInterviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadDashboardData = async () => {
       try {
-        const [profileRes, appsRes] = await Promise.all([
+        const [profileRes, appsRes, interviewsRes] = await Promise.all([
           api.get('/students/profile'),
           api.get('/applications/my'),
+          api.get('/interviews/my'),
         ]);
         setProfile(profileRes.data.profile);
         setApplications(appsRes.data.applications || []);
+        setInterviews(interviewsRes.data.interviews || []);
       } catch (err) {
         console.error('Failed to load dashboard data', err);
       } finally {
@@ -40,6 +43,7 @@ const StudentDashboard = () => {
 
   const selectedCount = applications.filter((a) => a.status === 'Selected').length;
   const shortlistedCount = applications.filter((a) => a.status === 'Shortlisted').length;
+  const activeInterviews = interviews.filter((i) => ['proposed', 'confirmed'].includes(i.status));
 
   return (
     <div>
@@ -53,7 +57,7 @@ const StudentDashboard = () => {
       </div>
 
       {/* Metrics Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
         <div className="card">
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Total Applications</span>
           <h2 style={{ fontSize: '2.2rem', fontWeight: '800', marginTop: '0.3rem', color: '#60a5fa' }}>{applications.length}</h2>
@@ -61,6 +65,14 @@ const StudentDashboard = () => {
         <div className="card">
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Shortlisted</span>
           <h2 style={{ fontSize: '2.2rem', fontWeight: '800', marginTop: '0.3rem', color: '#fbbf24' }}>{shortlistedCount}</h2>
+        </div>
+        <div className="card">
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Active Interviews</span>
+          <h2 style={{ fontSize: '2.2rem', fontWeight: '800', marginTop: '0.3rem', color: '#c084fc' }}>
+            <Link to="/student/interviews" style={{ color: 'inherit' }}>
+              {activeInterviews.length}
+            </Link>
+          </h2>
         </div>
         <div className="card">
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Offers / Selected</span>
