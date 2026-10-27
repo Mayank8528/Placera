@@ -36,7 +36,7 @@ const Login = () => {
           Welcome Back
         </h2>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem', textAlign: 'center' }}>
-          Log in to your PlacementHub account
+          Log in to your Placera account
         </p>
 
         {error && <div className="alert alert-error">{error}</div>}

@@ -12,7 +12,7 @@ const Notification = require('../models/Notification');
 const connectDB = require('../config/db');
 
 async function runSecurityAuditTests() {
-  console.log('=== Starting PlacementHub Phase 2: Security & Reliability Audit Test Suite ===');
+  console.log('=== Starting Placera Phase 2: Security & Reliability Audit Test Suite ===');
 
   await connectDB();
 
@@ -74,7 +74,7 @@ async function runSecurityAuditTests() {
     }
   };
 
-  const secret = process.env.JWT_SECRET || 'fallback_placementhub_secret_key';
+  const secret = process.env.JWT_SECRET || 'fallback_placera_secret_key';
   const getAuthHeader = (userId) => {
     const token = jwt.sign({ id: userId }, secret, { expiresIn: '1h' });
     return { Authorization: `Bearer ${token}` };
@@ -118,7 +118,7 @@ async function runSecurityAuditTests() {
 
     adminUser = await User.create({
       name: 'Audit Admin',
-      email: `admin_${tag}@placementhub.edu`,
+      email: `admin_${tag}@placera.edu`,
       password: 'password123',
       role: 'admin',
     });

@@ -49,7 +49,7 @@ const makeRequest = (server, { method, path, headers = {}, body = null }) => {
   });
 };
 
-test.describe('PlacementHub V2 Backend Security & Validation Tests', () => {
+test.describe('Placera V2 Backend Security & Validation Tests', () => {
   let server;
 
   test.before(() => {

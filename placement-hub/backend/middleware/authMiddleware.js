@@ -23,7 +23,7 @@ const protect = async (req, res, next) => {
         });
       }
 
-      const secret = process.env.JWT_SECRET || 'fallback_placementhub_secret_key';
+      const secret = process.env.JWT_SECRET || 'fallback_placera_secret_key';
       const decoded = jwt.verify(token, secret);
 
       const user = await User.findById(decoded.id).select('-password');
@@ -85,7 +85,7 @@ const optionalAuth = async (req, res, next) => {
     try {
       const token = req.headers.authorization.split(' ')[1];
       if (token) {
-        const secret = process.env.JWT_SECRET || 'fallback_placementhub_secret_key';
+        const secret = process.env.JWT_SECRET || 'fallback_placera_secret_key';
         const decoded = jwt.verify(token, secret);
         const user = await User.findById(decoded.id).select('-password');
         if (user) {

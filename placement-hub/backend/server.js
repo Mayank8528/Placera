@@ -9,5 +9,6 @@ connectDB().catch((err) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`[PlacementHub Server] Running on http://localhost:${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
+  console.log(`[Placera Server] Running on http://localhost:${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
 });
+

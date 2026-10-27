@@ -13,9 +13,9 @@ const seedAdmin = async () => {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('[Seed] Connected to MongoDB');
 
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@placementhub.edu';
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@placera.edu';
     const adminPassword = process.env.ADMIN_PASSWORD || 'AdminPass123!';
-    const adminName = process.env.ADMIN_NAME || 'Placement Admin';
+    const adminName = process.env.ADMIN_NAME || 'Placera Admin';
 
     // Check if admin already exists
     const existing = await User.findOne({ email: adminEmail });
@@ -35,7 +35,7 @@ const seedAdmin = async () => {
     });
 
     console.log('========================================================');
-    console.log(' PlacementHub Admin Account Created Successfully!      ');
+    console.log(' Placera Admin Account Created Successfully!            ');
     console.log('========================================================');
     console.log(` Name:     ${admin.name}`);
     console.log(` Email:    ${admin.email}`);

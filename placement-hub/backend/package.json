@@ -1,7 +1,7 @@
 {
-  "name": "placement-hub-backend",
+  "name": "placera-backend",
   "version": "1.0.0",
-  "description": "Backend API for PlacementHub - College Placement Management Platform",
+  "description": "Backend API for Placera - College Placement Management Platform",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

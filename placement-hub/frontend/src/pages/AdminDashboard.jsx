@@ -62,7 +62,7 @@ const AdminDashboard = () => {
     <div>
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ fontSize: '1.9rem', fontWeight: '800', marginBottom: '0.3rem' }}>
-          PlacementHub Administration
+          Placera Administration
         </h1>
         <p style={{ color: 'var(--text-muted)' }}>
           System-wide oversight for registered students, recruiting companies, and campus job drives.

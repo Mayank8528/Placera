@@ -20,7 +20,7 @@ const Navbar = () => {
       <div className="nav-container">
         <Link to="/" className="nav-brand">
           <span className="nav-brand-logo">P</span>
-          <span>PlacementHub</span>
+          <span>Placera</span>
         </Link>
 
         <nav>

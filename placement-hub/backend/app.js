@@ -50,7 +50,7 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({
     success: true,
     status: 'ok',
-    message: 'PlacementHub Backend API is running smoothly',
+    message: 'Placera Backend API is running smoothly',
     timestamp: new Date().toISOString(),
   });
 });

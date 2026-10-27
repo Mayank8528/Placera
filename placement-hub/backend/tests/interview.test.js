@@ -11,7 +11,7 @@ const Notification = require('../models/Notification');
 const connectDB = require('../config/db');
 
 async function runInterviewTests() {
-  console.log('=== Starting PlacementHub Interview Scheduling Test Suite ===');
+  console.log('=== Starting Placera Interview Scheduling Test Suite ===');
 
   // Connect to DB for stateful tests
   await connectDB();
@@ -65,7 +65,7 @@ async function runInterviewTests() {
     }
   };
 
-  const secret = process.env.JWT_SECRET || 'fallback_placementhub_secret_key';
+  const secret = process.env.JWT_SECRET || 'fallback_placera_secret_key';
   const getAuthHeader = (userId) => {
     const token = jwt.sign({ id: userId }, secret, { expiresIn: '1h' });
     return { Authorization: `Bearer ${token}` };

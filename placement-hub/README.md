@@ -1,13 +1,13 @@
-# PlacementHub — College Placement Management Platform (V1)
+# Placera — College Placement Management Platform (V1)
 
-PlacementHub is a clean, modular full-stack MERN (MongoDB, Express.js, React, Node.js) web application designed for colleges and universities to manage on-campus placement drives, job applications, student profiles, and recruiter workflows.
+Placera is a clean, modular full-stack MERN (MongoDB, Express.js, React, Node.js) web application designed for colleges and universities to manage on-campus placement drives, job applications, student profiles, and recruiter workflows.
 
 ---
 
 ## 📁 Project Architecture & Structure
 
 ```text
-placement-hub/
+placera/
 ├── .gitignore
 ├── README.md
 ├── backend/
@@ -101,8 +101,8 @@ In this Version 1 educational build, the JWT is stored in the browser's `localSt
 ### Prerequisites
 1. **Node.js** (v18+ recommended)
 2. **MongoDB**:
-   - **Option A (Local)**: Local MongoDB community server running on `mongodb://localhost:27017`
-   - **Option B (Cloud)**: Free MongoDB Atlas cluster URI (e.g., `mongodb+srv://<username>:<password>@cluster0.mongodb.net/placementhub?retryWrites=true&w=majority`)
+   - **Option A (Local)**: Local MongoDB community server running on `mongodb://localhost:27017/placera`
+   - **Option B (Cloud)**: Free MongoDB Atlas cluster URI (e.g., `mongodb+srv://<username>:<password>@cluster0.mongodb.net/placera?retryWrites=true&w=majority`)
 
 ---
 
@@ -110,7 +110,7 @@ In this Version 1 educational build, the JWT is stored in the browser's `localSt
 
 1. Open your terminal in the backend directory:
    ```bash
-   cd placement-hub/backend
+   cd backend
    ```
 2. Install dependencies:
    ```bash
@@ -124,7 +124,7 @@ In this Version 1 educational build, the JWT is stored in the browser's `localSt
    Open `.env` and verify/update:
    ```env
    PORT=5000
-   MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/placementhub?retryWrites=true&w=majority
+   MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/placera?retryWrites=true&w=majority
    JWT_SECRET=your_jwt_secret_key_here
    CLIENT_URL=http://localhost:5173
    NODE_ENV=development
@@ -141,7 +141,7 @@ In this Version 1 educational build, the JWT is stored in the browser's `localSt
    npm run seed:admin
    ```
    *Default dev credentials created:*
-   - **Email**: `admin@placementhub.edu`
+   - **Email**: `admin@placera.edu`
    - **Password**: `AdminPass123!`
 
 5. Start the backend server:
@@ -156,7 +156,7 @@ In this Version 1 educational build, the JWT is stored in the browser's `localSt
 
 1. Open a new terminal in the frontend directory:
    ```bash
-   cd placement-hub/frontend
+   cd frontend
    ```
 2. Install dependencies:
    ```bash
@@ -261,7 +261,7 @@ Use this checklist to test the application once your MongoDB instance is running
    - [ ] Register a recruiter (`hr@techcorp.com`).
    - [ ] Attempt registration with duplicate email `alice@college.edu`; verify 400 error.
    - [ ] Test login with wrong password; verify descriptive error without leaking hash.
-   - [ ] Login as `admin@placementhub.edu` (seeded credentials); verify redirection to `/admin/dashboard`.
+   - [ ] Login as `admin@placera.edu` (seeded credentials); verify redirection to `/admin/dashboard`.
 2. **Student Workflows**:
    - [ ] Navigate to "My Profile" and save College, Branch, Graduation Year, and Skills.
    - [ ] Browse jobs and apply to an active job.
@@ -278,3 +278,4 @@ Use this checklist to test the application once your MongoDB instance is running
 4. **Notifications**:
    - [ ] Check notification bell badge increments upon proposed/rescheduled/cancelled events.
    - [ ] Open notification dropdown, click item to jump to interview, and mark as read.
+

@@ -3,7 +3,7 @@ const http = require('http');
 const app = require('../app');
 
 async function runTests() {
-  console.log('--- Starting PlacementHub V2 Automated Backend Verification ---');
+  console.log('--- Starting Placera V2 Automated Backend Verification ---');
   
   const server = http.createServer(app);
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));

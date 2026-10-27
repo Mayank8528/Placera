@@ -59,7 +59,7 @@ const Register = () => {
           Create an Account
         </h2>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem', textAlign: 'center' }}>
-          Join PlacementHub as a Student or Recruiter
+          Join Placera as a Student or Recruiter
         </p>
 
         {error && <div className="alert alert-error">{error}</div>}
