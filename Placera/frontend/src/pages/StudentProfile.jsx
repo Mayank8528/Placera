@@ -1,4 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import {
+  User,
+  GraduationCap,
+  FileText,
+  UploadCloud,
+  CheckCircle2,
+  AlertCircle,
+  FileCheck,
+  Trash2,
+  ExternalLink,
+  Phone,
+  Mail,
+  Building
+} from 'lucide-react';
 import api from '../services/api';
 
 const StudentProfile = () => {
@@ -65,7 +80,7 @@ const StudentProfile = () => {
       return;
     }
 
-    // Client-side validations: File type and 5MB limit
+    // Client validations: PDF and 5MB limit
     if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
       setResumeMsg({ type: 'error', text: 'Invalid file format. Only PDF files (.pdf) are permitted.' });
       setSelectedFile(null);
@@ -106,13 +121,12 @@ const StudentProfile = () => {
       });
       setSelectedFile(null);
       setResumeMsg({ type: 'success', text: 'Resume uploaded successfully!' });
-      // Reset file input element
       const fileInput = document.getElementById('resumeFileInput');
       if (fileInput) fileInput.value = '';
     } catch (err) {
       setResumeMsg({
         type: 'error',
-        text: err.response?.data?.message || 'Failed to upload resume. Please check cloud storage credentials.',
+        text: err.response?.data?.message || 'Failed to upload resume. Please check storage configuration.',
       });
     } finally {
       setUploadingResume(false);
@@ -161,8 +175,10 @@ const StudentProfile = () => {
 
       const res = await api.put('/students/profile', payload);
       setSuccess(res.data.message || 'Profile updated successfully!');
+      setTimeout(() => setSuccess(''), 4000);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update profile');
+      setTimeout(() => setError(''), 4000);
     } finally {
       setSaving(false);
     }
@@ -172,27 +188,52 @@ const StudentProfile = () => {
     return (
       <div className="loading-spinner">
         <div className="spinner"></div>
-        <p>Loading your profile...</p>
+        <p>Loading your academic profile...</p>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: '680px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-      {/* 1. Academic & Personal Details Card */}
-      <div className="card">
-        <h2 style={{ fontSize: '1.6rem', fontWeight: '800', marginBottom: '0.4rem' }}>
-          Student Academic Profile
-        </h2>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-          Keep your academic and contact details up-to-date so recruiters can evaluate your background.
-        </p>
+    <div style={{ maxWidth: '780px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
+      <div className="page-header" style={{ marginBottom: 0 }}>
+        <div>
+          <div className="breadcrumbs">
+            <Link to="/student/dashboard">Portal</Link>
+            <span className="breadcrumbs-separator">/</span>
+            <span style={{ color: 'var(--text-main)' }}>Profile</span>
+          </div>
+          <h1 className="page-title">Student Profile & Credentials</h1>
+          <p className="page-subtitle">
+            Maintain your academic details and resume for corporate placement evaluation.
+          </p>
+        </div>
+      </div>
 
-        {success && <div className="alert alert-success">{success}</div>}
-        {error && <div className="alert alert-error">{error}</div>}
+      {success && (
+        <div className="alert alert-success" role="alert">
+          <CheckCircle2 size={16} />
+          <span>{success}</span>
+        </div>
+      )}
+
+      {error && (
+        <div className="alert alert-error" role="alert">
+          <AlertCircle size={16} />
+          <span>{error}</span>
+        </div>
+      )}
+
+      {/* 1. Academic & Personal Details */}
+      <div className="card">
+        <div className="card-header">
+          <h2 className="card-title">
+            <GraduationCap size={18} style={{ color: 'var(--accent-primary)' }} />
+            Academic & Contact Details
+          </h2>
+        </div>
 
         <form onSubmit={handleSubmit}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
             <div className="form-group">
               <label className="form-label" htmlFor="name">Full Name</label>
               <input
@@ -214,20 +255,20 @@ const StudentProfile = () => {
                 type="email"
                 disabled
                 className="form-input"
-                style={{ opacity: 0.7, cursor: 'not-allowed' }}
+                style={{ opacity: 0.6, cursor: 'not-allowed' }}
                 value={formData.email}
               />
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
             <div className="form-group">
-              <label className="form-label" htmlFor="college">College / University</label>
+              <label className="form-label" htmlFor="college">College / Institution</label>
               <input
                 id="college"
                 name="college"
                 type="text"
-                placeholder="e.g. State Institute of Technology"
+                placeholder="e.g. National Institute of Technology"
                 className="form-input"
                 value={formData.college}
                 onChange={handleChange}
@@ -235,7 +276,7 @@ const StudentProfile = () => {
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="branch">Branch / Specialization</label>
+              <label className="form-label" htmlFor="branch">Branch / Major</label>
               <input
                 id="branch"
                 name="branch"
@@ -248,7 +289,7 @@ const StudentProfile = () => {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
             <div className="form-group">
               <label className="form-label" htmlFor="graduationYear">Graduation Year</label>
               <input
@@ -280,52 +321,57 @@ const StudentProfile = () => {
 
           <div className="form-group">
             <label className="form-label" htmlFor="skills">
-              Key Skills (comma-separated)
+              Key Skills & Technologies (comma-separated)
             </label>
             <input
               id="skills"
               name="skills"
               type="text"
-              placeholder="e.g. React, Node.js, Python, SQL, Git, Docker"
+              placeholder="e.g. React, Node.js, Python, SQL, Docker, AWS"
               className="form-input"
               value={formData.skills}
               onChange={handleChange}
             />
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginTop: '0.2rem' }}>
-              Separate skills by commas to turn them into filterable tags.
+            <span className="form-hint">
+              These skills help recruiters filter candidate pools for relevant drives.
             </span>
           </div>
 
-          <button
-            type="submit"
-            className="btn btn-primary"
-            style={{ width: '100%', marginTop: '1rem' }}
-            disabled={saving}
-          >
-            {saving ? 'Saving Changes...' : 'Save Profile Details'}
-          </button>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.25rem' }}>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={saving}
+            >
+              {saving ? 'Saving...' : 'Save Profile Changes'}
+            </button>
+          </div>
         </form>
       </div>
 
-      {/* 2. Resume Upload Section */}
+      {/* 2. Resume Document Section */}
       <div className="card">
-        <h2 style={{ fontSize: '1.4rem', fontWeight: '800', marginBottom: '0.3rem' }}>
-          📄 Resume Document
-        </h2>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
-          Upload your latest resume in PDF format (maximum size 5 MB). Recruiters will review this document when you apply to campus drives.
+        <div className="card-header">
+          <h2 className="card-title">
+            <FileText size={18} style={{ color: 'var(--accent-primary)' }} />
+            Attached Resume (PDF)
+          </h2>
+        </div>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.25rem' }}>
+          Attach your latest resume for corporate recruiters to review during campus drive shortlisting.
         </p>
 
         {resumeMsg.text && (
           <div className={`alert ${resumeMsg.type === 'error' ? 'alert-error' : 'alert-success'}`}>
-            {resumeMsg.text}
+            {resumeMsg.type === 'error' ? <AlertCircle size={16} /> : <CheckCircle2 size={16} />}
+            <span>{resumeMsg.text}</span>
           </div>
         )}
 
-        {/* Current Resume status preview */}
+        {/* Current File Banner */}
         <div style={{
           padding: '1.25rem',
-          backgroundColor: 'rgba(15, 23, 42, 0.5)',
+          backgroundColor: 'var(--bg-surface)',
           borderRadius: 'var(--radius-md)',
           border: '1px solid var(--border-medium)',
           marginBottom: '1.5rem',
@@ -333,28 +379,28 @@ const StudentProfile = () => {
           alignItems: 'center',
           justifyContent: 'space-between',
           flexWrap: 'wrap',
-          gap: '1rem'
+          gap: '1rem',
         }}>
           <div>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>
-              Current Uploaded File
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '600', display: 'block', marginBottom: '0.25rem' }}>
+              Current Document
             </span>
             {resumeData.url ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontSize: '1.1rem' }}>📎</span>
-                <strong style={{ color: '#60a5fa', wordBreak: 'break-all' }}>
+                <FileCheck size={18} style={{ color: '#6ee7b7' }} />
+                <span style={{ color: 'var(--text-main)', fontWeight: '600', fontSize: '0.9rem' }}>
                   {resumeData.filename || 'Student_Resume.pdf'}
-                </strong>
+                </span>
               </div>
             ) : (
-              <span style={{ color: 'var(--text-dim)', fontStyle: 'italic' }}>
-                Resume not uploaded
+              <span style={{ color: 'var(--text-dim)', fontStyle: 'italic', fontSize: '0.85rem' }}>
+                No resume file attached yet
               </span>
             )}
           </div>
 
           {resumeData.url && (
-            <div style={{ display: 'flex', gap: '0.6rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
               <button
                 type="button"
                 onClick={async () => {
@@ -371,7 +417,7 @@ const StudentProfile = () => {
                 }}
                 className="btn btn-secondary btn-sm"
               >
-                View / Download PDF
+                <ExternalLink size={13} /> View PDF
               </button>
               <button
                 type="button"
@@ -379,17 +425,17 @@ const StudentProfile = () => {
                 disabled={uploadingResume}
                 className="btn btn-danger btn-sm"
               >
-                Remove
+                <Trash2 size={13} /> Remove
               </button>
             </div>
           )}
         </div>
 
-        {/* Upload / Replace Form */}
+        {/* Upload Form */}
         <form onSubmit={handleResumeUpload}>
           <div className="form-group">
             <label className="form-label" htmlFor="resumeFileInput">
-              {resumeData.url ? 'Replace Existing Resume (PDF)' : 'Upload New Resume (PDF)'}
+              {resumeData.url ? 'Replace Document (PDF only, max 5 MB)' : 'Upload Document (PDF only, max 5 MB)'}
             </label>
             <input
               id="resumeFileInput"
@@ -399,19 +445,18 @@ const StudentProfile = () => {
               onChange={handleFileChange}
               disabled={uploadingResume}
             />
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginTop: '0.3rem' }}>
-              Only PDF format is accepted. Maximum file size: 5 MB.
-            </span>
           </div>
 
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={!selectedFile || uploadingResume}
-            style={{ marginTop: '0.5rem' }}
-          >
-            {uploadingResume ? 'Uploading Document...' : resumeData.url ? 'Replace Resume' : 'Upload Resume'}
-          </button>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+            <button
+              type="submit"
+              className="btn btn-primary btn-sm"
+              disabled={!selectedFile || uploadingResume}
+            >
+              <UploadCloud size={14} />
+              {uploadingResume ? 'Uploading...' : resumeData.url ? 'Replace Resume' : 'Upload Resume'}
+            </button>
+          </div>
         </form>
       </div>
     </div>

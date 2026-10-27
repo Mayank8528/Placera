@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Calendar, Clock, Video, MapPin, X, AlertCircle } from 'lucide-react';
 import api from '../services/api';
 
 const ScheduleInterviewModal = ({ isOpen, onClose, applicant, jobId, jobTitle, onScheduled }) => {
@@ -61,28 +62,37 @@ const ScheduleInterviewModal = ({ isOpen, onClose, applicant, jobId, jobTitle, o
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
           <div>
-            <h2 style={{ fontSize: '1.3rem', fontWeight: '800' }}>Schedule Interview</h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-              Candidate: <strong>{applicant.student?.name}</strong> • {jobTitle}
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '700', letterSpacing: '-0.01em', color: 'var(--text-main)' }}>
+              Schedule Candidate Interview
+            </h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginTop: '0.2rem' }}>
+              Candidate: <strong style={{ color: 'var(--text-secondary)' }}>{applicant.student?.name}</strong> • {jobTitle}
             </p>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="btn btn-secondary btn-sm"
-            style={{ padding: '0.2rem 0.5rem', lineHeight: 1 }}
+            className="btn btn-tertiary btn-sm"
+            style={{ padding: '0.25rem', color: 'var(--text-dim)' }}
+            aria-label="Close dialog"
           >
-            ✕
+            <X size={16} />
           </button>
         </div>
 
-        {error && <div className="alert alert-error" style={{ marginBottom: '1rem', fontSize: '0.85rem' }}>{error}</div>}
+        {error && (
+          <div className="alert alert-error" style={{ marginBottom: '1rem', fontSize: '0.82rem' }}>
+            <AlertCircle size={15} />
+            <span>{error}</span>
+          </div>
+        )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
             <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label" style={{ fontSize: '0.85rem' }}>Start Date & Time</label>
+              <label className="form-label" style={{ fontSize: '0.8rem' }}>Start Time</label>
               <input
                 type="datetime-local"
                 className="form-input"
@@ -92,7 +102,7 @@ const ScheduleInterviewModal = ({ isOpen, onClose, applicant, jobId, jobTitle, o
               />
             </div>
             <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label" style={{ fontSize: '0.85rem' }}>End Date & Time</label>
+              <label className="form-label" style={{ fontSize: '0.8rem' }}>End Time</label>
               <input
                 type="datetime-local"
                 className="form-input"
@@ -104,35 +114,39 @@ const ScheduleInterviewModal = ({ isOpen, onClose, applicant, jobId, jobTitle, o
           </div>
 
           <div className="form-group" style={{ marginBottom: 0 }}>
-            <label className="form-label" style={{ fontSize: '0.85rem' }}>Interview Mode</label>
+            <label className="form-label" style={{ fontSize: '0.8rem' }}>Interview Channel / Mode</label>
             <select
               className="form-select"
               value={mode}
               onChange={(e) => setMode(e.target.value)}
             >
               <option value="online">Online (Video Conference)</option>
-              <option value="in-person">In-Person (On Campus / Office)</option>
+              <option value="in-person">In-Person (On Campus / Placement Cell)</option>
             </select>
           </div>
 
           {mode === 'online' ? (
             <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label" style={{ fontSize: '0.85rem' }}>Meeting Link (Google Meet, Zoom, Teams)</label>
+              <label className="form-label" style={{ fontSize: '0.8rem' }}>
+                Video Meeting Link (Google Meet, Teams, Zoom)
+              </label>
               <input
                 type="url"
                 className="form-input"
-                placeholder="https://meet.google.com/..."
+                placeholder="https://meet.google.com/xyz-abc-def"
                 value={meetingLink}
                 onChange={(e) => setMeetingLink(e.target.value)}
               />
             </div>
           ) : (
             <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label" style={{ fontSize: '0.85rem' }}>Interview Location / Room</label>
+              <label className="form-label" style={{ fontSize: '0.8rem' }}>
+                Campus Venue / Room
+              </label>
               <input
                 type="text"
                 className="form-input"
-                placeholder="e.g. Placement Cell Conference Room B"
+                placeholder="e.g. Placement Cell Conference Room 2"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
               />
@@ -140,9 +154,11 @@ const ScheduleInterviewModal = ({ isOpen, onClose, applicant, jobId, jobTitle, o
           )}
 
           <div className="form-group" style={{ marginBottom: 0 }}>
-            <label className="form-label" style={{ fontSize: '0.85rem' }}>Instructions / Notes (Optional)</label>
+            <label className="form-label" style={{ fontSize: '0.8rem' }}>
+              Candidate Instructions / Notes
+            </label>
             <textarea
-              className="form-input"
+              className="form-textarea"
               rows={3}
               placeholder="e.g. Please join 5 mins early with your college ID card..."
               value={instructions}
@@ -150,12 +166,12 @@ const ScheduleInterviewModal = ({ isOpen, onClose, applicant, jobId, jobTitle, o
             />
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.6rem', marginTop: '0.5rem' }}>
             <button type="button" onClick={onClose} className="btn btn-secondary btn-sm" disabled={loading}>
               Cancel
             </button>
             <button type="submit" className="btn btn-primary btn-sm" disabled={loading}>
-              {loading ? 'Scheduling...' : 'Send Interview Proposal'}
+              {loading ? 'Dispatching...' : 'Dispatch Proposal'}
             </button>
           </div>
         </form>

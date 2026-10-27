@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Calendar, Clock, Video, MapPin, X, AlertCircle } from 'lucide-react';
 import api from '../services/api';
 
 const RescheduleInterviewModal = ({ isOpen, onClose, interview, onRescheduled }) => {
@@ -59,28 +60,37 @@ const RescheduleInterviewModal = ({ isOpen, onClose, interview, onRescheduled })
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
           <div>
-            <h2 style={{ fontSize: '1.3rem', fontWeight: '800' }}>Reschedule Interview</h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-              Candidate: <strong>{interview.studentId?.name}</strong> • {interview.jobId?.title}
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '700', letterSpacing: '-0.01em', color: 'var(--text-main)' }}>
+              Reschedule Interview
+            </h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginTop: '0.2rem' }}>
+              Candidate: <strong style={{ color: 'var(--text-secondary)' }}>{interview.studentId?.name}</strong> • {interview.jobId?.title}
             </p>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="btn btn-secondary btn-sm"
-            style={{ padding: '0.2rem 0.5rem', lineHeight: 1 }}
+            className="btn btn-tertiary btn-sm"
+            style={{ padding: '0.25rem', color: 'var(--text-dim)' }}
+            aria-label="Close dialog"
           >
-            ✕
+            <X size={16} />
           </button>
         </div>
 
-        {error && <div className="alert alert-error" style={{ marginBottom: '1rem', fontSize: '0.85rem' }}>{error}</div>}
+        {error && (
+          <div className="alert alert-error" style={{ marginBottom: '1rem', fontSize: '0.82rem' }}>
+            <AlertCircle size={15} />
+            <span>{error}</span>
+          </div>
+        )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
             <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label" style={{ fontSize: '0.85rem' }}>New Start Time</label>
+              <label className="form-label" style={{ fontSize: '0.8rem' }}>New Start Time</label>
               <input
                 type="datetime-local"
                 className="form-input"
@@ -90,7 +100,7 @@ const RescheduleInterviewModal = ({ isOpen, onClose, interview, onRescheduled })
               />
             </div>
             <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label" style={{ fontSize: '0.85rem' }}>New End Time</label>
+              <label className="form-label" style={{ fontSize: '0.8rem' }}>New End Time</label>
               <input
                 type="datetime-local"
                 className="form-input"
@@ -102,20 +112,20 @@ const RescheduleInterviewModal = ({ isOpen, onClose, interview, onRescheduled })
           </div>
 
           <div className="form-group" style={{ marginBottom: 0 }}>
-            <label className="form-label" style={{ fontSize: '0.85rem' }}>Interview Mode</label>
+            <label className="form-label" style={{ fontSize: '0.8rem' }}>Interview Channel / Mode</label>
             <select
               className="form-select"
               value={mode}
               onChange={(e) => setMode(e.target.value)}
             >
               <option value="online">Online (Video Conference)</option>
-              <option value="in-person">In-Person (On Campus / Office)</option>
+              <option value="in-person">In-Person (On Campus / Placement Cell)</option>
             </select>
           </div>
 
           {mode === 'online' ? (
             <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label" style={{ fontSize: '0.85rem' }}>Meeting Link</label>
+              <label className="form-label" style={{ fontSize: '0.8rem' }}>Meeting Link</label>
               <input
                 type="url"
                 className="form-input"
@@ -125,7 +135,7 @@ const RescheduleInterviewModal = ({ isOpen, onClose, interview, onRescheduled })
             </div>
           ) : (
             <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label" style={{ fontSize: '0.85rem' }}>Location / Room</label>
+              <label className="form-label" style={{ fontSize: '0.8rem' }}>Location / Room</label>
               <input
                 type="text"
                 className="form-input"
@@ -136,21 +146,21 @@ const RescheduleInterviewModal = ({ isOpen, onClose, interview, onRescheduled })
           )}
 
           <div className="form-group" style={{ marginBottom: 0 }}>
-            <label className="form-label" style={{ fontSize: '0.85rem' }}>Updated Instructions</label>
+            <label className="form-label" style={{ fontSize: '0.8rem' }}>Updated Notes for Candidate</label>
             <textarea
-              className="form-input"
+              className="form-textarea"
               rows={3}
               value={instructions}
               onChange={(e) => setInstructions(e.target.value)}
             />
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.6rem', marginTop: '0.5rem' }}>
             <button type="button" onClick={onClose} className="btn btn-secondary btn-sm" disabled={loading}>
               Cancel
             </button>
             <button type="submit" className="btn btn-primary btn-sm" disabled={loading}>
-              {loading ? 'Updating...' : 'Confirm Reschedule'}
+              {loading ? 'Updating...' : 'Update & Notify'}
             </button>
           </div>
         </form>

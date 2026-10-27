@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Bell, Check, Clock } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -84,7 +85,7 @@ const NotificationBell = () => {
         title="Notifications"
         aria-label="View notifications"
       >
-        <span style={{ fontSize: '1.2rem' }}>🔔</span>
+        <Bell size={18} />
         {unreadCount > 0 && <span className="notif-badge">{unreadCount}</span>}
       </button>
 
@@ -100,20 +101,24 @@ const NotificationBell = () => {
                   background: 'none',
                   border: 'none',
                   color: 'var(--accent-primary)',
-                  fontSize: '0.78rem',
+                  fontSize: '0.75rem',
                   cursor: 'pointer',
                   fontWeight: '600',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.25rem',
                 }}
               >
-                Mark all read
+                <Check size={12} /> Mark all read
               </button>
             )}
           </div>
 
           <div className="notif-list">
             {notifications.length === 0 ? (
-              <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                No notifications yet
+              <div style={{ padding: '2.5rem 1rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                <Clock size={24} style={{ margin: '0 auto 0.5rem auto', color: 'var(--text-dim)', display: 'block' }} />
+                No new notifications
               </div>
             ) : (
               notifications.map((notif) => (
@@ -125,12 +130,12 @@ const NotificationBell = () => {
                   <div className="notif-item-title">
                     <span>{notif.title}</span>
                     {!notif.isRead && (
-                      <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#6366f1', display: 'inline-block' }} />
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--accent-primary)', display: 'inline-block' }} />
                     )}
                   </div>
                   <div className="notif-item-msg">{notif.message}</div>
                   <div className="notif-item-time">
-                    {new Date(notif.createdAt).toLocaleDateString()} at{' '}
+                    {new Date(notif.createdAt).toLocaleDateString()} •{' '}
                     {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </div>
                 </div>

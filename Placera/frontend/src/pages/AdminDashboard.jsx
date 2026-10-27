@@ -1,4 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import {
+  Shield,
+  Users,
+  Briefcase,
+  Trash2,
+  CheckCircle2,
+  AlertCircle,
+  Building,
+  GraduationCap,
+  Calendar,
+  Search
+} from 'lucide-react';
 import api from '../services/api';
 
 const AdminDashboard = () => {
@@ -8,6 +20,7 @@ const AdminDashboard = () => {
   const [error, setError] = useState('');
   const [actionSuccess, setActionSuccess] = useState('');
   const [activeTab, setActiveTab] = useState('jobs'); // 'jobs' | 'users'
+  const [searchFilter, setSearchFilter] = useState('');
 
   const fetchAdminData = async () => {
     try {
@@ -30,7 +43,7 @@ const AdminDashboard = () => {
 
   const handleDeleteJob = async (jobId) => {
     const confirmed = window.confirm(
-      'Administrative action: Are you sure you want to delete this job listing? It will also wipe associated student applications.'
+      'Administrative action: Are you sure you want to remove this job listing? It will also wipe associated candidate applications.'
     );
 
     if (!confirmed) return;
@@ -58,92 +71,186 @@ const AdminDashboard = () => {
   const studentCount = users.filter((u) => u.role === 'student').length;
   const recruiterCount = users.filter((u) => u.role === 'recruiter').length;
 
+  const filteredJobs = jobs.filter((j) => {
+    const q = searchFilter.toLowerCase().trim();
+    if (!q) return true;
+    return (
+      j.title?.toLowerCase().includes(q) ||
+      j.companyName?.toLowerCase().includes(q) ||
+      j.location?.toLowerCase().includes(q)
+    );
+  });
+
+  const filteredUsers = users.filter((u) => {
+    const q = searchFilter.toLowerCase().trim();
+    if (!q) return true;
+    return (
+      u.name?.toLowerCase().includes(q) ||
+      u.email?.toLowerCase().includes(q) ||
+      u.role?.toLowerCase().includes(q)
+    );
+  });
+
   return (
     <div>
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.9rem', fontWeight: '800', marginBottom: '0.3rem' }}>
-          Placera Administration
-        </h1>
-        <p style={{ color: 'var(--text-muted)' }}>
-          System-wide oversight for registered students, recruiting companies, and campus job drives.
-        </p>
+      <div className="page-header">
+        <div>
+          <div className="breadcrumbs">
+            <span>Admin Console</span>
+            <span className="breadcrumbs-separator">/</span>
+            <span style={{ color: 'var(--text-main)' }}>Moderation</span>
+          </div>
+          <h1 className="page-title">Placera Administration Console</h1>
+          <p className="page-subtitle">
+            System-wide oversight for student records, corporate recruiters, and campus job drives.
+          </p>
+        </div>
       </div>
 
-      {actionSuccess && <div className="alert alert-success">{actionSuccess}</div>}
-      {error && <div className="alert alert-error">{error}</div>}
+      {actionSuccess && (
+        <div className="alert alert-success" role="alert">
+          <CheckCircle2 size={16} />
+          <span>{actionSuccess}</span>
+        </div>
+      )}
+
+      {error && (
+        <div className="alert alert-error" role="alert">
+          <AlertCircle size={16} />
+          <span>{error}</span>
+        </div>
+      )}
 
       {/* Metrics Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
-        <div className="card">
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Registered Students</span>
-          <h2 style={{ fontSize: '2.2rem', fontWeight: '800', marginTop: '0.3rem', color: '#60a5fa' }}>{studentCount}</h2>
+      <div className="metrics-grid">
+        <div className="metric-card">
+          <div className="metric-header">
+            <span className="metric-label">Registered Students</span>
+            <div className="metric-icon-wrap" style={{ color: '#60a5fa' }}>
+              <GraduationCap size={16} />
+            </div>
+          </div>
+          <div className="metric-value">{studentCount}</div>
+          <div className="metric-caption">Active candidate profiles</div>
         </div>
-        <div className="card">
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Active Recruiters</span>
-          <h2 style={{ fontSize: '2.2rem', fontWeight: '800', marginTop: '0.3rem', color: '#a78bfa' }}>{recruiterCount}</h2>
+
+        <div className="metric-card">
+          <div className="metric-header">
+            <span className="metric-label">Active Recruiters</span>
+            <div className="metric-icon-wrap" style={{ color: '#c084fc' }}>
+              <Building size={16} />
+            </div>
+          </div>
+          <div className="metric-value" style={{ color: '#d8b4fe' }}>{recruiterCount}</div>
+          <div className="metric-caption">Hiring organizations</div>
         </div>
-        <div className="card">
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Total Job Postings</span>
-          <h2 style={{ fontSize: '2.2rem', fontWeight: '800', marginTop: '0.3rem', color: '#34d399' }}>{jobs.length}</h2>
+
+        <div className="metric-card">
+          <div className="metric-header">
+            <span className="metric-label">Total Job Postings</span>
+            <div className="metric-icon-wrap" style={{ color: '#34d399' }}>
+              <Briefcase size={16} />
+            </div>
+          </div>
+          <div className="metric-value" style={{ color: '#6ee7b7' }}>{jobs.length}</div>
+          <div className="metric-caption">Campus recruitment drives</div>
         </div>
       </div>
 
-      {/* Tab Switcher */}
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-medium)', paddingBottom: '0.75rem' }}>
-        <button
-          onClick={() => setActiveTab('jobs')}
-          className={`btn ${activeTab === 'jobs' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
-        >
-          Manage Job Listings ({jobs.length})
-        </button>
-        <button
-          onClick={() => setActiveTab('users')}
-          className={`btn ${activeTab === 'users' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
-        >
-          View Registered Users ({users.length})
-        </button>
+      {/* Tab Switcher & Search Filter */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem' }}>
+        <div style={{ display: 'flex', gap: '0.4rem', background: 'var(--bg-input)', padding: '4px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-medium)' }}>
+          <button
+            type="button"
+            onClick={() => { setActiveTab('jobs'); setSearchFilter(''); }}
+            style={{
+              padding: '0.45rem 0.9rem',
+              fontSize: '0.82rem',
+              fontWeight: '600',
+              borderRadius: 'var(--radius-sm)',
+              border: 'none',
+              cursor: 'pointer',
+              backgroundColor: activeTab === 'jobs' ? 'var(--accent-primary)' : 'transparent',
+              color: activeTab === 'jobs' ? '#fff' : 'var(--text-muted)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            Job Drives ({jobs.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => { setActiveTab('users'); setSearchFilter(''); }}
+            style={{
+              padding: '0.45rem 0.9rem',
+              fontSize: '0.82rem',
+              fontWeight: '600',
+              borderRadius: 'var(--radius-sm)',
+              border: 'none',
+              cursor: 'pointer',
+              backgroundColor: activeTab === 'users' ? 'var(--accent-primary)' : 'transparent',
+              color: activeTab === 'users' ? '#fff' : 'var(--text-muted)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            User Directory ({users.length})
+          </button>
+        </div>
+
+        <div className="input-with-icon" style={{ maxWidth: '300px' }}>
+          <Search className="input-icon-left" />
+          <input
+            type="text"
+            className="form-input"
+            placeholder={activeTab === 'jobs' ? 'Filter jobs...' : 'Filter users...'}
+            value={searchFilter}
+            onChange={(e) => setSearchFilter(e.target.value)}
+            style={{ padding: '0.45rem 0.75rem 0.45rem 2.2rem', fontSize: '0.82rem' }}
+          />
+        </div>
       </div>
 
       {/* Tab Content: Jobs */}
       {activeTab === 'jobs' && (
-        <div className="card">
-          <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '1rem' }}>
-            All Campus Job Drives
-          </h3>
-
-          {jobs.length === 0 ? (
-            <div className="empty-state">No job listings found.</div>
+        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+          {filteredJobs.length === 0 ? (
+            <div className="empty-state" style={{ margin: '1.5rem', background: 'transparent' }}>
+              <Briefcase className="empty-state-icon" />
+              <h3>No job listings match</h3>
+              <p>{searchFilter ? 'Try clearing your search query.' : 'No jobs created yet.'}</p>
+            </div>
           ) : (
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.95rem' }}>
+            <div className="table-container" style={{ border: 'none', borderRadius: 0 }}>
+              <table className="data-table">
                 <thead>
-                  <tr style={{ borderBottom: '1px solid var(--border-medium)', color: 'var(--text-muted)' }}>
-                    <th style={{ padding: '0.75rem 0.5rem' }}>Role Title</th>
-                    <th style={{ padding: '0.75rem 0.5rem' }}>Company</th>
-                    <th style={{ padding: '0.75rem 0.5rem' }}>Posted By (Recruiter)</th>
-                    <th style={{ padding: '0.75rem 0.5rem' }}>Location</th>
-                    <th style={{ padding: '0.75rem 0.5rem' }}>Deadline</th>
-                    <th style={{ padding: '0.75rem 0.5rem', textAlign: 'right' }}>Admin Actions</th>
+                  <tr>
+                    <th>Role Title</th>
+                    <th>Company</th>
+                    <th>Posted By</th>
+                    <th>Location</th>
+                    <th>Deadline</th>
+                    <th style={{ textAlign: 'right' }}>Admin Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {jobs.map((job) => (
-                    <tr key={job._id} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                      <td style={{ padding: '0.85rem 0.5rem', fontWeight: '600' }}>{job.title}</td>
-                      <td style={{ padding: '0.85rem 0.5rem', color: 'var(--accent-primary)' }}>{job.companyName}</td>
-                      <td style={{ padding: '0.85rem 0.5rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                  {filteredJobs.map((job) => (
+                    <tr key={job._id}>
+                      <td style={{ fontWeight: '600', color: 'var(--text-main)' }}>{job.title}</td>
+                      <td>{job.companyName}</td>
+                      <td style={{ color: 'var(--text-dim)', fontSize: '0.82rem' }}>
                         {job.postedBy ? `${job.postedBy.name} (${job.postedBy.email})` : 'Unknown'}
                       </td>
-                      <td style={{ padding: '0.85rem 0.5rem', color: 'var(--text-muted)' }}>{job.location}</td>
-                      <td style={{ padding: '0.85rem 0.5rem', color: 'var(--text-dim)', fontSize: '0.85rem' }}>
+                      <td>{job.location}</td>
+                      <td style={{ color: 'var(--text-dim)', fontSize: '0.82rem' }}>
                         {new Date(job.deadline).toLocaleDateString()}
                       </td>
-                      <td style={{ padding: '0.85rem 0.5rem', textAlign: 'right' }}>
+                      <td style={{ textAlign: 'right' }}>
                         <button
+                          type="button"
                           onClick={() => handleDeleteJob(job._id)}
                           className="btn btn-danger btn-sm"
+                          style={{ fontSize: '0.75rem' }}
                         >
-                          Remove Job
+                          <Trash2 size={12} /> Remove
                         </button>
                       </td>
                     </tr>
@@ -157,39 +264,51 @@ const AdminDashboard = () => {
 
       {/* Tab Content: Users */}
       {activeTab === 'users' && (
-        <div className="card">
-          <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '1rem' }}>
-            Registered Users Directory
-          </h3>
-
-          {users.length === 0 ? (
-            <div className="empty-state">No users registered yet.</div>
+        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+          {filteredUsers.length === 0 ? (
+            <div className="empty-state" style={{ margin: '1.5rem', background: 'transparent' }}>
+              <Users className="empty-state-icon" />
+              <h3>No users found</h3>
+              <p>No user accounts matched the filter.</p>
+            </div>
           ) : (
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.95rem' }}>
+            <div className="table-container" style={{ border: 'none', borderRadius: 0 }}>
+              <table className="data-table">
                 <thead>
-                  <tr style={{ borderBottom: '1px solid var(--border-medium)', color: 'var(--text-muted)' }}>
-                    <th style={{ padding: '0.75rem 0.5rem' }}>Name</th>
-                    <th style={{ padding: '0.75rem 0.5rem' }}>Email Address</th>
-                    <th style={{ padding: '0.75rem 0.5rem' }}>System Role</th>
-                    <th style={{ padding: '0.75rem 0.5rem' }}>Registration Date</th>
+                  <tr>
+                    <th>Full Name</th>
+                    <th>Email Address</th>
+                    <th>Role</th>
+                    <th>Registration Date</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((u) => (
-                    <tr key={u._id} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                      <td style={{ padding: '0.85rem 0.5rem', fontWeight: '600' }}>{u.name}</td>
-                      <td style={{ padding: '0.85rem 0.5rem', color: 'var(--text-muted)' }}>{u.email}</td>
-                      <td style={{ padding: '0.85rem 0.5rem' }}>
-                        <span className="role-pill" style={{
-                          backgroundColor: u.role === 'admin' ? 'rgba(239,68,68,0.2)' : u.role === 'recruiter' ? 'rgba(168,85,247,0.2)' : 'rgba(59,130,246,0.2)',
-                          color: u.role === 'admin' ? '#f87171' : u.role === 'recruiter' ? '#c084fc' : '#60a5fa',
-                          borderColor: 'transparent'
-                        }}>
+                  {filteredUsers.map((u) => (
+                    <tr key={u._id}>
+                      <td style={{ fontWeight: '600', color: 'var(--text-main)' }}>{u.name}</td>
+                      <td style={{ color: 'var(--text-secondary)' }}>{u.email}</td>
+                      <td>
+                        <span
+                          className="role-pill"
+                          style={{
+                            color:
+                              u.role === 'admin'
+                                ? '#f87171'
+                                : u.role === 'recruiter'
+                                ? '#c084fc'
+                                : '#60a5fa',
+                            backgroundColor:
+                              u.role === 'admin'
+                                ? 'rgba(239,68,68,0.1)'
+                                : u.role === 'recruiter'
+                                ? 'rgba(168,85,247,0.1)'
+                                : 'rgba(59,130,246,0.1)',
+                          }}
+                        >
                           {u.role}
                         </span>
                       </td>
-                      <td style={{ padding: '0.85rem 0.5rem', color: 'var(--text-dim)', fontSize: '0.85rem' }}>
+                      <td style={{ color: 'var(--text-dim)', fontSize: '0.82rem' }}>
                         {new Date(u.createdAt).toLocaleDateString()}
                       </td>
                     </tr>

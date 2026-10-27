@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  Briefcase,
+  Calendar,
+  Users,
+  PlusCircle,
+  ArrowRight,
+  TrendingUp,
+  MapPin,
+  Clock,
+  CheckCircle2
+} from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -42,86 +53,113 @@ const RecruiterDashboard = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+      <div className="page-header">
         <div>
-          <h1 style={{ fontSize: '1.8rem', fontWeight: '800', marginBottom: '0.3rem' }}>
-            Recruiter Portal — {user?.name}
+          <div className="breadcrumbs">
+            <span>Recruiter Console</span>
+            <span className="breadcrumbs-separator">/</span>
+            <span style={{ color: 'var(--text-main)' }}>Overview</span>
+          </div>
+          <h1 className="page-title">
+            Hiring Portal — {user?.name}
           </h1>
-          <p style={{ color: 'var(--text-muted)' }}>
-            Manage campus recruitment drives, schedule interviews, and evaluate candidate stages.
+          <p className="page-subtitle">
+            Manage your organization's campus drives, screen candidate applications, and coordinate evaluation interviews.
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <Link to="/recruiter/interviews" className="btn btn-secondary">
-            🗓️ Interviews
+        <div style={{ display: 'flex', gap: '0.6rem' }}>
+          <Link to="/recruiter/interviews" className="btn btn-secondary btn-sm">
+            <Calendar size={14} /> Interviews
           </Link>
-          <Link to="/recruiter/jobs/create" className="btn btn-primary">
-            + Post Opening
+          <Link to="/recruiter/jobs/create" className="btn btn-primary btn-sm">
+            <PlusCircle size={14} /> Post Opening
           </Link>
         </div>
       </div>
 
       {/* Metrics Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem', marginBottom: '2.5rem' }}>
-        <div className="card">
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Total Job Postings</span>
-          <h2 style={{ fontSize: '2.2rem', fontWeight: '800', marginTop: '0.3rem', color: '#60a5fa' }}>{jobs.length}</h2>
+      <div className="metrics-grid">
+        <div className="metric-card">
+          <div className="metric-header">
+            <span className="metric-label">Total Job Postings</span>
+            <div className="metric-icon-wrap">
+              <Briefcase size={16} />
+            </div>
+          </div>
+          <div className="metric-value">{jobs.length}</div>
+          <div className="metric-caption">Campus drives created</div>
         </div>
-        <div className="card">
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Active Drives</span>
-          <h2 style={{ fontSize: '2.2rem', fontWeight: '800', marginTop: '0.3rem', color: '#34d399' }}>{activeJobs}</h2>
+
+        <div className="metric-card">
+          <div className="metric-header">
+            <span className="metric-label">Active Drives</span>
+            <div className="metric-icon-wrap" style={{ color: '#34d399' }}>
+              <TrendingUp size={16} />
+            </div>
+          </div>
+          <div className="metric-value" style={{ color: '#6ee7b7' }}>{activeJobs}</div>
+          <div className="metric-caption">Accepting applications</div>
         </div>
-        <div className="card">
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Active Interviews</span>
-          <h2 style={{ fontSize: '2.2rem', fontWeight: '800', marginTop: '0.3rem', color: '#c084fc' }}>
-            <Link to="/recruiter/interviews" style={{ color: 'inherit' }}>
-              {activeInterviews}
-            </Link>
-          </h2>
+
+        <div className="metric-card">
+          <div className="metric-header">
+            <span className="metric-label">Active Interviews</span>
+            <div className="metric-icon-wrap" style={{ color: '#c084fc' }}>
+              <Calendar size={16} />
+            </div>
+          </div>
+          <div className="metric-value" style={{ color: '#d8b4fe' }}>
+            <Link to="/recruiter/interviews">{activeInterviews}</Link>
+          </div>
+          <div className="metric-caption">Proposed or confirmed slots</div>
         </div>
       </div>
 
-      {/* Quick Access to My Jobs */}
-      <div className="card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: '700' }}>Your Recent Job Postings</h3>
-          <Link to="/recruiter/jobs" style={{ color: 'var(--accent-primary)', fontSize: '0.9rem', fontWeight: '600' }}>
-            Manage All Jobs &rarr;
+      {/* Quick Access to Recent Postings */}
+      <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+        <div style={{ padding: '1.25rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)' }}>
+          <h2 className="card-title" style={{ margin: 0 }}>
+            <Briefcase size={18} style={{ color: 'var(--accent-primary)' }} />
+            Recent Postings
+          </h2>
+          <Link to="/recruiter/jobs" style={{ color: '#818cf8', fontSize: '0.82rem', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+            Manage all ({jobs.length}) <ArrowRight size={13} />
           </Link>
         </div>
 
         {jobs.length === 0 ? (
-          <div className="empty-state" style={{ padding: '2.5rem 1rem' }}>
+          <div className="empty-state" style={{ margin: '1.5rem', background: 'transparent' }}>
+            <Briefcase className="empty-state-icon" />
             <h3>No job postings yet</h3>
-            <p>Create your first job listing to start receiving campus applications.</p>
-            <Link to="/recruiter/jobs/create" className="btn btn-primary btn-sm" style={{ marginTop: '0.8rem' }}>
-              Create Job Posting
+            <p>Create your first recruitment drive listing to begin receiving campus applications.</p>
+            <Link to="/recruiter/jobs/create" className="btn btn-primary btn-sm" style={{ marginTop: '1rem' }}>
+              <PlusCircle size={14} /> Create Job Posting
             </Link>
           </div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.95rem' }}>
+          <div className="table-container" style={{ border: 'none', borderRadius: 0 }}>
+            <table className="data-table">
               <thead>
-                <tr style={{ borderBottom: '1px solid var(--border-medium)', color: 'var(--text-muted)' }}>
-                  <th style={{ padding: '0.75rem 0.5rem' }}>Job Title</th>
-                  <th style={{ padding: '0.75rem 0.5rem' }}>Company</th>
-                  <th style={{ padding: '0.75rem 0.5rem' }}>Location</th>
-                  <th style={{ padding: '0.75rem 0.5rem' }}>Deadline</th>
-                  <th style={{ padding: '0.75rem 0.5rem', textAlign: 'right' }}>Action</th>
+                <tr>
+                  <th>Job Title</th>
+                  <th>Company</th>
+                  <th>Location</th>
+                  <th>Deadline</th>
+                  <th style={{ textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {jobs.slice(0, 5).map((job) => (
-                  <tr key={job._id} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                    <td style={{ padding: '0.85rem 0.5rem', fontWeight: '600' }}>{job.title}</td>
-                    <td style={{ padding: '0.85rem 0.5rem', color: 'var(--text-muted)' }}>{job.companyName}</td>
-                    <td style={{ padding: '0.85rem 0.5rem', color: 'var(--text-muted)' }}>{job.location}</td>
-                    <td style={{ padding: '0.85rem 0.5rem', color: 'var(--text-dim)', fontSize: '0.85rem' }}>
+                  <tr key={job._id}>
+                    <td style={{ fontWeight: '600', color: 'var(--text-main)' }}>{job.title}</td>
+                    <td>{job.companyName}</td>
+                    <td>{job.location}</td>
+                    <td style={{ color: 'var(--text-dim)', fontSize: '0.82rem' }}>
                       {new Date(job.deadline).toLocaleDateString()}
                     </td>
-                    <td style={{ padding: '0.85rem 0.5rem', textAlign: 'right' }}>
-                      <Link to={`/recruiter/jobs/${job._id}/applicants`} className="btn btn-primary btn-sm">
-                        View Applicants
+                    <td style={{ textAlign: 'right' }}>
+                      <Link to={`/recruiter/jobs/${job._id}/applicants`} className="btn btn-primary btn-sm" style={{ fontSize: '0.78rem' }}>
+                        <Users size={12} /> Applicants
                       </Link>
                     </td>
                   </tr>

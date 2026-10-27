@@ -1,9 +1,11 @@
 import React from 'react';
 
 const StatusBadge = ({ status }) => {
+  const norm = status?.toLowerCase() || 'applied';
+
   let badgeClass = 'badge-applied';
 
-  switch (status?.toLowerCase()) {
+  switch (norm) {
     case 'shortlisted':
       badgeClass = 'badge-shortlisted';
       break;
@@ -24,12 +26,16 @@ const StatusBadge = ({ status }) => {
       badgeClass = 'badge-applied';
   }
 
-  // Format display text (e.g., capitalize first letter)
   const displayStatus = status
     ? status.charAt(0).toUpperCase() + status.slice(1)
     : 'Applied';
 
-  return <span className={`badge ${badgeClass}`}>{displayStatus}</span>;
+  return (
+    <span className={`badge ${badgeClass}`}>
+      <span className="badge-dot" />
+      <span>{displayStatus}</span>
+    </span>
+  );
 };
 
 export default StatusBadge;

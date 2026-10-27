@@ -1,5 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  Calendar,
+  Clock,
+  Video,
+  MapPin,
+  CheckCircle,
+  XCircle,
+  RotateCcw,
+  Check,
+  Filter,
+  ExternalLink,
+  AlertCircle
+} from 'lucide-react';
 import api from '../services/api';
 import StatusBadge from '../components/StatusBadge';
 import RescheduleInterviewModal from '../components/RescheduleInterviewModal';
@@ -52,10 +65,13 @@ const RecruiterInterviews = () => {
     return i.status === filterStatus;
   });
 
-  // Group by upcoming vs past
   const now = new Date();
-  const upcoming = filteredInterviews.filter((i) => new Date(i.endTime) >= now && i.status !== 'cancelled' && i.status !== 'completed');
-  const pastOrDone = filteredInterviews.filter((i) => new Date(i.endTime) < now || i.status === 'cancelled' || i.status === 'completed');
+  const upcoming = filteredInterviews.filter(
+    (i) => new Date(i.endTime) >= now && i.status !== 'cancelled' && i.status !== 'completed'
+  );
+  const pastOrDone = filteredInterviews.filter(
+    (i) => new Date(i.endTime) < now || i.status === 'cancelled' || i.status === 'completed'
+  );
 
   if (loading) {
     return (
@@ -68,23 +84,26 @@ const RecruiterInterviews = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+      <div className="page-header">
         <div>
-          <h1 style={{ fontSize: '1.8rem', fontWeight: '800', marginBottom: '0.3rem' }}>
-            Interview Management
-          </h1>
-          <p style={{ color: 'var(--text-muted)' }}>
-            Track scheduled interviews, respond to candidate statuses, reschedule, or complete sessions.
+          <div className="breadcrumbs">
+            <Link to="/recruiter/dashboard">Hiring Workspace</Link>
+            <span className="breadcrumbs-separator">/</span>
+            <span style={{ color: 'var(--text-main)' }}>Interviews</span>
+          </div>
+          <h1 className="page-title">Interview Coordination</h1>
+          <p className="page-subtitle">
+            Coordinate candidate rounds, inspect confirmation states, reschedule sessions, or complete assessments.
           </p>
         </div>
 
         {/* Filter controls */}
-        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <select
             className="form-select"
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            style={{ width: 'auto' }}
+            style={{ width: 'auto', fontSize: '0.82rem' }}
           >
             <option value="all">All Statuses ({interviews.length})</option>
             <option value="active">Active (Proposed / Confirmed)</option>
@@ -97,57 +116,76 @@ const RecruiterInterviews = () => {
         </div>
       </div>
 
-      {successMessage && <div className="alert alert-success">{successMessage}</div>}
-      {error && <div className="alert alert-error">{error}</div>}
+      {successMessage && (
+        <div className="alert alert-success" role="alert">
+          <CheckCircle size={16} />
+          <span>{successMessage}</span>
+        </div>
+      )}
 
-      {/* Upcoming Section */}
+      {error && (
+        <div className="alert alert-error" role="alert">
+          <AlertCircle size={16} />
+          <span>{error}</span>
+        </div>
+      )}
+
+      {/* Upcoming & Active Section */}
       <div style={{ marginBottom: '2.5rem' }}>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span>🗓️ Active & Upcoming Interviews</span>
-          <span className="role-pill" style={{ fontSize: '0.75rem' }}>{upcoming.length}</span>
-        </h2>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+          <h2 style={{ fontSize: '1.15rem', fontWeight: '600', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Calendar size={18} style={{ color: 'var(--accent-primary)' }} />
+            Active & Upcoming Sessions
+          </h2>
+          <span className="role-pill">{upcoming.length} active</span>
+        </div>
 
         {upcoming.length === 0 ? (
-          <div className="empty-state" style={{ padding: '2rem 1rem' }}>
-            <p>No upcoming interviews scheduled under this filter.</p>
+          <div className="empty-state">
+            <Calendar className="empty-state-icon" />
+            <h3>No active interviews in this view</h3>
+            <p>Shortlist candidates from your job postings and schedule evaluation rounds.</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {upcoming.map((interview) => (
-              <div key={interview._id} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <div key={interview._id} className="card" style={{ padding: '1.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1rem' }}>
                   <div>
-                    <h3 style={{ fontSize: '1.15rem', fontWeight: '700', color: 'var(--text-main)', marginBottom: '0.2rem' }}>
+                    <h3 style={{ fontSize: '1.15rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.2rem' }}>
                       {interview.studentId?.name} — {interview.jobId?.title}
                     </h3>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-                      Candidate Email: <strong>{interview.studentId?.email}</strong> • Mode: <span style={{ textTransform: 'capitalize', color: 'var(--accent-primary)', fontWeight: '600' }}>{interview.mode}</span>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>
+                      Candidate Email: <strong style={{ color: 'var(--text-secondary)' }}>{interview.studentId?.email}</strong>
                     </p>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                     <StatusBadge status={interview.status} />
 
                     {interview.status !== 'cancelled' && interview.status !== 'completed' && (
                       <>
                         <button
+                          type="button"
                           onClick={() => setRescheduleTarget(interview)}
                           className="btn btn-secondary btn-sm"
                         >
-                          🔄 Reschedule
+                          <RotateCcw size={12} /> Reschedule
                         </button>
                         <button
+                          type="button"
                           onClick={() => setCancelTarget(interview)}
                           className="btn btn-danger btn-sm"
                         >
-                          ✕ Cancel
+                          Cancel
                         </button>
                         {interview.status === 'confirmed' && (
                           <button
+                            type="button"
                             onClick={() => handleMarkComplete(interview._id)}
                             className="btn btn-primary btn-sm"
                           >
-                            ✓ Mark Completed
+                            <Check size={13} /> Complete
                           </button>
                         )}
                       </>
@@ -155,77 +193,85 @@ const RecruiterInterviews = () => {
                   </div>
                 </div>
 
-                {/* Interview Timing & Details Box */}
+                {/* Timing Grid */}
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
                   gap: '0.75rem',
-                  padding: '0.85rem 1.25rem',
-                  backgroundColor: 'rgba(15, 23, 42, 0.4)',
+                  padding: '0.85rem 1rem',
+                  backgroundColor: 'var(--bg-surface)',
                   borderRadius: 'var(--radius-md)',
-                  fontSize: '0.85rem',
-                  border: '1px solid var(--border-subtle)'
+                  fontSize: '0.82rem',
+                  border: '1px solid var(--border-subtle)',
                 }}>
                   <div>
-                    <span style={{ color: 'var(--text-dim)', display: 'block' }}>Date</span>
-                    <strong>{new Date(interview.startTime).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</strong>
+                    <span style={{ color: 'var(--text-dim)', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: '600', display: 'block' }}>Date & Day</span>
+                    <strong style={{ color: 'var(--text-main)' }}>
+                      {new Date(interview.startTime).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                    </strong>
                   </div>
                   <div>
-                    <span style={{ color: 'var(--text-dim)', display: 'block' }}>Time Window</span>
-                    <strong>
+                    <span style={{ color: 'var(--text-dim)', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: '600', display: 'block' }}>Window</span>
+                    <strong style={{ color: 'var(--text-main)' }}>
                       {new Date(interview.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       {' - '}
                       {new Date(interview.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </strong>
                   </div>
                   <div>
-                    <span style={{ color: 'var(--text-dim)', display: 'block' }}>Location / Link</span>
+                    <span style={{ color: 'var(--text-dim)', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: '600', display: 'block' }}>Channel / Mode</span>
+                    <strong style={{ textTransform: 'capitalize', color: 'var(--text-main)' }}>{interview.mode}</strong>
+                  </div>
+                  <div>
+                    <span style={{ color: 'var(--text-dim)', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: '600', display: 'block' }}>Meeting Link / Venue</span>
                     {interview.mode === 'online' ? (
                       interview.meetingLink ? (
-                        <a href={interview.meetingLink} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-primary)', textDecoration: 'underline' }}>
-                          Join Online Meeting 🔗
+                        <a
+                          href={interview.meetingLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: '#818cf8', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
+                        >
+                          Join Call <ExternalLink size={12} />
                         </a>
                       ) : (
-                        <span style={{ color: 'var(--text-muted)' }}>Link not provided yet</span>
+                        <span style={{ color: 'var(--text-dim)' }}>No meeting URL set</span>
                       )
                     ) : (
-                      <span>{interview.location || 'Campus / Office'}</span>
+                      <span style={{ color: 'var(--text-main)' }}>{interview.location || 'On-campus placement hall'}</span>
                     )}
                   </div>
                 </div>
-
-                {interview.instructions && (
-                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.02)', padding: '0.6rem 0.8rem', borderRadius: 'var(--radius-sm)' }}>
-                    <strong style={{ color: 'var(--text-dim)' }}>Instructions: </strong> {interview.instructions}
-                  </div>
-                )}
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* Past / Completed / Cancelled Section */}
+      {/* Past / Cancelled / Completed */}
       <div>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span>📜 Past, Completed & Cancelled Interviews</span>
-          <span className="role-pill" style={{ fontSize: '0.75rem' }}>{pastOrDone.length}</span>
-        </h2>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+          <h2 style={{ fontSize: '1.15rem', fontWeight: '600', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Clock size={18} style={{ color: 'var(--text-dim)' }} />
+            Completed & Closed Sessions
+          </h2>
+          <span className="role-pill">{pastOrDone.length} past</span>
+        </div>
 
         {pastOrDone.length === 0 ? (
-          <div className="empty-state" style={{ padding: '2rem 1rem' }}>
-            <p>No past or closed interviews to show.</p>
+          <div className="card" style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-dim)', fontSize: '0.85rem' }}>
+            No past interviews in this filter.
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {pastOrDone.map((interview) => (
-              <div key={interview._id} className="card" style={{ opacity: 0.85 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.5rem' }}>
+              <div key={interview._id} className="card" style={{ padding: '1rem 1.25rem', opacity: 0.85 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
                   <div>
-                    <h3 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--text-main)', marginBottom: '0.2rem' }}>
+                    <h3 style={{ fontSize: '0.95rem', fontWeight: '600', color: 'var(--text-main)' }}>
                       {interview.studentId?.name} — {interview.jobId?.title}
                     </h3>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                    <p style={{ color: 'var(--text-dim)', fontSize: '0.78rem' }}>
                       {new Date(interview.startTime).toLocaleDateString()} at{' '}
                       {new Date(interview.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • Mode: {interview.mode}
                     </p>
@@ -236,8 +282,8 @@ const RecruiterInterviews = () => {
                 </div>
 
                 {interview.cancellationReason && (
-                  <div style={{ fontSize: '0.82rem', color: '#fca5a5', marginTop: '0.3rem' }}>
-                    <strong>Cancellation Reason:</strong> {interview.cancellationReason}
+                  <div style={{ fontSize: '0.78rem', color: '#fca5a5', marginTop: '0.4rem', borderTop: '1px solid var(--border-subtle)', paddingTop: '0.4rem' }}>
+                    <strong>Cancellation Note:</strong> {interview.cancellationReason}
                   </div>
                 )}
               </div>
@@ -246,30 +292,28 @@ const RecruiterInterviews = () => {
         )}
       </div>
 
-      {/* Reschedule Modal */}
       {rescheduleTarget && (
         <RescheduleInterviewModal
           isOpen={!!rescheduleTarget}
           onClose={() => setRescheduleTarget(null)}
           interview={rescheduleTarget}
           onRescheduled={(updated) => {
-            setSuccessMessage(`Interview rescheduled to ${new Date(updated.startTime).toLocaleString()}`);
-            setTimeout(() => setSuccessMessage(''), 3000);
-            fetchInterviews();
+            setSuccessMessage('Interview slot rescheduled and notification sent');
+            setInterviews((prev) => prev.map((i) => (i._id === updated._id ? updated : i)));
+            setTimeout(() => setSuccessMessage(''), 4000);
           }}
         />
       )}
 
-      {/* Cancel Modal */}
       {cancelTarget && (
         <CancelInterviewModal
           isOpen={!!cancelTarget}
           onClose={() => setCancelTarget(null)}
           interview={cancelTarget}
           onCancelled={(updated) => {
-            setSuccessMessage('Interview cancelled');
-            setTimeout(() => setSuccessMessage(''), 3000);
-            fetchInterviews();
+            setSuccessMessage('Interview cancelled and time slot released');
+            setInterviews((prev) => prev.map((i) => (i._id === updated._id ? updated : i)));
+            setTimeout(() => setSuccessMessage(''), 4000);
           }}
         />
       )}

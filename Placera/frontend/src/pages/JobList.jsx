@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Search, MapPin, Banknote, Briefcase, Calendar, Sparkles, Filter } from 'lucide-react';
 import api from '../services/api';
 import JobCard from '../components/JobCard';
 
@@ -23,12 +25,12 @@ const JobList = () => {
     fetchJobs();
   }, []);
 
-  // Basic client-side keyword filtering across title, company, skills, or location
   const filteredJobs = jobs.filter((job) => {
-    const query = searchQuery.toLowerCase();
-    const titleMatch = job.title.toLowerCase().includes(query);
-    const companyMatch = job.companyName.toLowerCase().includes(query);
-    const locationMatch = job.location.toLowerCase().includes(query);
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+    const titleMatch = job.title?.toLowerCase().includes(query);
+    const companyMatch = job.companyName?.toLowerCase().includes(query);
+    const locationMatch = job.location?.toLowerCase().includes(query);
     const skillsMatch = (job.requiredSkills || []).some((s) => s.toLowerCase().includes(query));
 
     return titleMatch || companyMatch || locationMatch || skillsMatch;
@@ -36,27 +38,46 @@ const JobList = () => {
 
   return (
     <div>
-      <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
-        <h1 style={{ fontSize: '2.2rem', fontWeight: '800', marginBottom: '0.5rem', background: 'var(--accent-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', display: 'inline-block' }}>
-          Explore Campus Drives & Jobs
-        </h1>
-        <p style={{ color: 'var(--text-muted)', fontSize: '1rem', maxWidth: '600px', margin: '0 auto 1.5rem auto' }}>
-          Discover placement openings, internships, and full-time opportunities from verified hiring partners.
-        </p>
-
-        {/* Search Input Filter */}
-        <div style={{ maxWidth: '500px', margin: '0 auto' }}>
-          <input
-            type="text"
-            className="form-input"
-            placeholder="🔍 Search by job title, company, skill (e.g. React, Python), or location..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+      <div className="page-header" style={{ marginBottom: '1.5rem' }}>
+        <div>
+          <div className="breadcrumbs">
+            <Link to="/student/dashboard">Portal</Link>
+            <span className="breadcrumbs-separator">/</span>
+            <span style={{ color: 'var(--text-main)' }}>Campus Drives</span>
+          </div>
+          <h1 className="page-title">Explore Placement Drives & Opportunities</h1>
+          <p className="page-subtitle">
+            Browse through active corporate recruitment drives, internships, and associate programs.
+          </p>
         </div>
       </div>
 
-      {error && <div className="alert alert-error">{error}</div>}
+      {/* Filter and Search Bar */}
+      <div className="card" style={{ padding: '1rem 1.25rem', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <div className="input-with-icon" style={{ flex: '1', minWidth: '240px' }}>
+            <Search className="input-icon-left" />
+            <input
+              type="text"
+              className="form-input"
+              placeholder="Filter by role, company, skills (e.g. React, Python), or location..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Search job listings"
+            />
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-dim)', fontSize: '0.82rem' }}>
+            <Filter size={14} />
+            <span>Showing {filteredJobs.length} of {jobs.length} drives</span>
+          </div>
+        </div>
+      </div>
+
+      {error && (
+        <div className="alert alert-error" role="alert">
+          <span>{error}</span>
+        </div>
+      )}
 
       {loading ? (
         <div className="loading-spinner">
@@ -65,8 +86,23 @@ const JobList = () => {
         </div>
       ) : filteredJobs.length === 0 ? (
         <div className="empty-state">
-          <h3>No opportunities found</h3>
-          <p>{searchQuery ? 'Try adjusting your search keywords.' : 'No active job drives have been posted yet.'}</p>
+          <Briefcase className="empty-state-icon" />
+          <h3>No recruitment drives found</h3>
+          <p>
+            {searchQuery
+              ? `No openings match "${searchQuery}". Try different search terms or clear the filter.`
+              : 'There are currently no active campus job drives posted.'}
+          </p>
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="btn btn-secondary btn-sm"
+              style={{ marginTop: '0.85rem' }}
+            >
+              Clear Search Filter
+            </button>
+          )}
         </div>
       ) : (
         <div className="grid-cards">

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import { Briefcase, ArrowLeft, Building, MapPin, Banknote, Calendar, CheckCircle2, AlertCircle } from 'lucide-react';
 import api from '../services/api';
 
 const CreateEditJob = () => {
@@ -85,29 +86,42 @@ const CreateEditJob = () => {
     return (
       <div className="loading-spinner">
         <div className="spinner"></div>
-        <p>Loading job form...</p>
+        <p>Loading position form...</p>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: '720px', margin: '0 auto' }}>
-      <Link to="/recruiter/jobs" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-        &larr; Back to My Postings
-      </Link>
+    <div style={{ maxWidth: '780px', margin: '0 auto' }}>
+      <div className="breadcrumbs" style={{ marginBottom: '1.25rem' }}>
+        <Link to="/recruiter/jobs" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+          <ArrowLeft size={13} /> Back to My Postings
+        </Link>
+        <span className="breadcrumbs-separator">/</span>
+        <span style={{ color: 'var(--text-main)' }}>{isEditMode ? 'Edit Opening' : 'New Opening'}</span>
+      </div>
 
-      <div className="card">
-        <h2 style={{ fontSize: '1.7rem', fontWeight: '800', marginBottom: '0.3rem' }}>
-          {isEditMode ? 'Edit Job Posting' : 'Create New Campus Drive'}
-        </h2>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-          Provide the role requirements and application parameters for interested students.
-        </p>
+      <div className="card" style={{ padding: '2rem' }}>
+        <div className="card-header" style={{ marginBottom: '1.5rem' }}>
+          <div>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: '700', letterSpacing: '-0.02em', color: 'var(--text-main)' }}>
+              {isEditMode ? 'Edit Campus Drive' : 'Publish New Campus Drive'}
+            </h1>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.25rem' }}>
+              Define the requirements, compensation package, and application deadline.
+            </p>
+          </div>
+        </div>
 
-        {error && <div className="alert alert-error">{error}</div>}
+        {error && (
+          <div className="alert alert-error" role="alert">
+            <AlertCircle size={16} />
+            <span>{error}</span>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
             <div className="form-group">
               <label className="form-label" htmlFor="title">Job Title</label>
               <input
@@ -123,13 +137,13 @@ const CreateEditJob = () => {
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="companyName">Company Name</label>
+              <label className="form-label" htmlFor="companyName">Company / Organization</label>
               <input
                 id="companyName"
                 name="companyName"
                 type="text"
                 required
-                placeholder="e.g. Acme Cloud Corp"
+                placeholder="e.g. Cisco Systems India"
                 className="form-input"
                 value={formData.companyName}
                 onChange={handleChange}
@@ -137,15 +151,15 @@ const CreateEditJob = () => {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
             <div className="form-group">
-              <label className="form-label" htmlFor="location">Location</label>
+              <label className="form-label" htmlFor="location">Work Location</label>
               <input
                 id="location"
                 name="location"
                 type="text"
                 required
-                placeholder="e.g. Bengaluru / Hybrid / Remote"
+                placeholder="e.g. Bengaluru, Karnataka (Hybrid)"
                 className="form-input"
                 value={formData.location}
                 onChange={handleChange}
@@ -153,13 +167,13 @@ const CreateEditJob = () => {
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="salary">Salary / Package (CTC)</label>
+              <label className="form-label" htmlFor="salary">Compensation / Package (CTC)</label>
               <input
                 id="salary"
                 name="salary"
                 type="text"
                 required
-                placeholder="e.g. 8.5 LPA or 40,000/month"
+                placeholder="e.g. 12.0 LPA or ₹50,000/month"
                 className="form-input"
                 value={formData.salary}
                 onChange={handleChange}
@@ -167,7 +181,7 @@ const CreateEditJob = () => {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
             <div className="form-group">
               <label className="form-label" htmlFor="deadline">Application Deadline</label>
               <input
@@ -187,7 +201,7 @@ const CreateEditJob = () => {
                 id="requiredSkills"
                 name="requiredSkills"
                 type="text"
-                placeholder="e.g. JavaScript, React, Node.js, DSA"
+                placeholder="e.g. React, Node.js, DSA, System Design"
                 className="form-input"
                 value={formData.requiredSkills}
                 onChange={handleChange}
@@ -196,33 +210,33 @@ const CreateEditJob = () => {
           </div>
 
           <div className="form-group">
-            <label className="form-label" htmlFor="description">Job Description & Responsibilities</label>
+            <label className="form-label" htmlFor="description">Job Description & Eligibility Criteria</label>
             <textarea
               id="description"
               name="description"
               required
+              rows={5}
               className="form-textarea"
-              placeholder="Outline the responsibilities, eligibility criteria, interview rounds, etc."
+              placeholder="Outline role responsibilities, eligibility CGPA/branches, selection phases, and expectations..."
               value={formData.description}
               onChange={handleChange}
             />
           </div>
 
-          <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-            <button
-              type="submit"
-              className="btn btn-primary"
-              style={{ flex: 1 }}
-              disabled={submitting}
-            >
-              {submitting ? 'Saving...' : isEditMode ? 'Update Posting' : 'Publish Job Listing'}
-            </button>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem' }}>
             <button
               type="button"
-              className="btn btn-secondary"
+              className="btn btn-secondary btn-sm"
               onClick={() => navigate('/recruiter/jobs')}
             >
               Cancel
+            </button>
+            <button
+              type="submit"
+              className="btn btn-primary btn-sm"
+              disabled={submitting}
+            >
+              {submitting ? 'Saving...' : isEditMode ? 'Update Posting' : 'Publish Drive'}
             </button>
           </div>
         </form>

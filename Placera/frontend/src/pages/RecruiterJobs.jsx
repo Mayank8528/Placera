@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Briefcase, PlusCircle, AlertCircle, CheckCircle2 } from 'lucide-react';
 import api from '../services/api';
 import JobCard from '../components/JobCard';
 
@@ -30,7 +31,6 @@ const RecruiterJobs = () => {
   };
 
   const handleDelete = async (id) => {
-    // Confirmation before destructive action
     const confirmed = window.confirm(
       'Are you sure you want to delete this job posting? All student applications for this position will also be permanently removed.'
     );
@@ -50,24 +50,38 @@ const RecruiterJobs = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+      <div className="page-header">
         <div>
-          <h1 style={{ fontSize: '1.8rem', fontWeight: '800', marginBottom: '0.3rem' }}>
-            My Job Postings
-          </h1>
-          <p style={{ color: 'var(--text-muted)' }}>
-            Review, edit, or check applications for all jobs posted by your organization.
+          <div className="breadcrumbs">
+            <Link to="/recruiter/dashboard">Hiring Workspace</Link>
+            <span className="breadcrumbs-separator">/</span>
+            <span style={{ color: 'var(--text-main)' }}>Job Postings</span>
+          </div>
+          <h1 className="page-title">My Campus Drives & Postings</h1>
+          <p className="page-subtitle">
+            Manage your recruitment listings, update deadlines, and inspect applicants.
           </p>
         </div>
         <div>
-          <Link to="/recruiter/jobs/create" className="btn btn-primary">
-            + Post New Opening
+          <Link to="/recruiter/jobs/create" className="btn btn-primary btn-sm">
+            <PlusCircle size={14} /> Post New Opening
           </Link>
         </div>
       </div>
 
-      {deleteSuccess && <div className="alert alert-success">{deleteSuccess}</div>}
-      {error && <div className="alert alert-error">{error}</div>}
+      {deleteSuccess && (
+        <div className="alert alert-success" role="alert">
+          <CheckCircle2 size={16} />
+          <span>{deleteSuccess}</span>
+        </div>
+      )}
+
+      {error && (
+        <div className="alert alert-error" role="alert">
+          <AlertCircle size={16} />
+          <span>{error}</span>
+        </div>
+      )}
 
       {loading ? (
         <div className="loading-spinner">
@@ -76,10 +90,11 @@ const RecruiterJobs = () => {
         </div>
       ) : jobs.length === 0 ? (
         <div className="empty-state">
-          <h3>No jobs created yet</h3>
-          <p>You haven't posted any campus recruitment drives yet.</p>
-          <Link to="/recruiter/jobs/create" className="btn btn-primary" style={{ marginTop: '1rem' }}>
-            Post a Job Now
+          <Briefcase className="empty-state-icon" />
+          <h3>No recruitment drives created yet</h3>
+          <p>Publish an opening to begin receiving student profiles and scheduling interviews.</p>
+          <Link to="/recruiter/jobs/create" className="btn btn-primary btn-sm" style={{ marginTop: '1rem' }}>
+            <PlusCircle size={14} /> Post a Job Now
           </Link>
         </div>
       ) : (

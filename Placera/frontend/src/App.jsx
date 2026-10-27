@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import Navbar from './components/Navbar';
+import AppShell from './components/AppShell';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // Pages
@@ -23,55 +23,51 @@ import CreateEditJob from './pages/CreateEditJob';
 import JobApplicants from './pages/JobApplicants';
 
 import AdminDashboard from './pages/AdminDashboard';
-import { useAuth } from './context/AuthContext';
 
 function App() {
   return (
-    <div className="app-container">
-      <Navbar />
-      <main className="main-content">
-        <Routes>
-          {/* Public Authentication Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+    <AppShell>
+      <Routes>
+        {/* Public Authentication Routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-          {/* Root redirect: default to /login */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
+        {/* Root redirect: default to /login */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
 
-          {/* Protected Routes for Authenticated Users (Students & Admins to browse all jobs) */}
-          <Route element={<ProtectedRoute allowedRoles={['student', 'admin']} />}>
-            <Route path="/jobs" element={<JobList />} />
-            <Route path="/jobs/:id" element={<JobDetails />} />
-          </Route>
+        {/* Protected Routes for Authenticated Users (Students & Admins to browse all jobs) */}
+        <Route element={<ProtectedRoute allowedRoles={['student', 'admin']} />}>
+          <Route path="/jobs" element={<JobList />} />
+          <Route path="/jobs/:id" element={<JobDetails />} />
+        </Route>
 
-          {/* Student Protected Routes */}
-          <Route element={<ProtectedRoute allowedRoles={['student']} />}>
-            <Route path="/student/dashboard" element={<StudentDashboard />} />
-            <Route path="/student/applications" element={<StudentApplications />} />
-            <Route path="/student/interviews" element={<StudentInterviews />} />
-            <Route path="/student/profile" element={<StudentProfile />} />
-          </Route>
+        {/* Student Protected Routes */}
+        <Route element={<ProtectedRoute allowedRoles={['student']} />}>
+          <Route path="/student/dashboard" element={<StudentDashboard />} />
+          <Route path="/student/applications" element={<StudentApplications />} />
+          <Route path="/student/interviews" element={<StudentInterviews />} />
+          <Route path="/student/profile" element={<StudentProfile />} />
+        </Route>
 
-          {/* Recruiter Protected Routes */}
-          <Route element={<ProtectedRoute allowedRoles={['recruiter']} />}>
-            <Route path="/recruiter/dashboard" element={<RecruiterDashboard />} />
-            <Route path="/recruiter/jobs" element={<RecruiterJobs />} />
-            <Route path="/recruiter/interviews" element={<RecruiterInterviews />} />
-            <Route path="/recruiter/jobs/create" element={<CreateEditJob />} />
-            <Route path="/recruiter/jobs/:id/edit" element={<CreateEditJob />} />
-            <Route path="/recruiter/jobs/:jobId/applicants" element={<JobApplicants />} />
-          </Route>
+        {/* Recruiter Protected Routes */}
+        <Route element={<ProtectedRoute allowedRoles={['recruiter']} />}>
+          <Route path="/recruiter/dashboard" element={<RecruiterDashboard />} />
+          <Route path="/recruiter/jobs" element={<RecruiterJobs />} />
+          <Route path="/recruiter/interviews" element={<RecruiterInterviews />} />
+          <Route path="/recruiter/jobs/create" element={<CreateEditJob />} />
+          <Route path="/recruiter/jobs/:id/edit" element={<CreateEditJob />} />
+          <Route path="/recruiter/jobs/:jobId/applicants" element={<JobApplicants />} />
+        </Route>
 
-          {/* Admin Protected Routes */}
-          <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          </Route>
+        {/* Admin Protected Routes */}
+        <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        </Route>
 
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </main>
-    </div>
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </AppShell>
   );
 }
 
