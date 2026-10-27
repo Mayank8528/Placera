@@ -254,9 +254,8 @@ const respondToInterview = async (req, res, next) => {
     // Notify the Recruiter
     const notifType = response === 'confirm' ? 'interview_confirmed' : 'interview_declined';
     const notifTitle = response === 'confirm' ? `Interview Confirmed by Candidate` : `Interview Declined by Candidate`;
-    const notifMsg = `${req.user.name} has ${response === 'confirm' ? 'confirmed' : 'declined'} the interview for "${
-      interview.jobId?.title
-    }" scheduled on ${formatDateTime(interview.startTime)} UTC.`;
+    const notifMsg = `${req.user.name} has ${response === 'confirm' ? 'confirmed' : 'declined'} the interview for "${interview.jobId?.title
+      }" scheduled on ${formatDateTime(interview.startTime)} UTC.`;
 
     await createNotification({
       recipient: interview.recruiterId._id,
@@ -418,9 +417,8 @@ const cancelInterview = async (req, res, next) => {
       sender: req.user._id,
       type: 'interview_cancelled',
       title: `Interview Cancelled: ${interview.jobId?.title}`,
-      message: `${req.user.name} (${interview.jobId?.companyName}) has cancelled the scheduled interview for "${interview.jobId?.title}".${
-        interview.cancellationReason ? ` Reason: ${interview.cancellationReason}` : ''
-      }`,
+      message: `${req.user.name} (${interview.jobId?.companyName}) has cancelled the scheduled interview for "${interview.jobId?.title}".${interview.cancellationReason ? ` Reason: ${interview.cancellationReason}` : ''
+        }`,
       relatedInterview: interview._id,
     });
 

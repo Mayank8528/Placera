@@ -42,9 +42,8 @@ const checkInterviewConflict = async ({ recruiterId, studentId, startTime, endTi
     return {
       hasConflict: true,
       conflictingWith: 'recruiter',
-      reason: `Recruiter already has an active interview scheduled with candidate ${
-        recruiterConflict.studentId?.name || 'another candidate'
-      } between ${new Date(recruiterConflict.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} and ${new Date(recruiterConflict.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}.`,
+      reason: `Recruiter already has an active interview scheduled with candidate ${recruiterConflict.studentId?.name || 'another candidate'
+        } between ${new Date(recruiterConflict.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} and ${new Date(recruiterConflict.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}.`,
     };
   }
 
@@ -58,9 +57,8 @@ const checkInterviewConflict = async ({ recruiterId, studentId, startTime, endTi
     return {
       hasConflict: true,
       conflictingWith: 'student',
-      reason: `Candidate already has an active interview scheduled for "${
-        studentConflict.jobId?.title || 'another position'
-      }" (${studentConflict.jobId?.companyName || 'another recruiter'}) during this time slot.`,
+      reason: `Candidate already has an active interview scheduled for "${studentConflict.jobId?.title || 'another position'
+        }" (${studentConflict.jobId?.companyName || 'another recruiter'}) during this time slot.`,
     };
   }
 
